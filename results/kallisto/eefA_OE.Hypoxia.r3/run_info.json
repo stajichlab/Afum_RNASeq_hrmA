@@ -1,0 +1,9 @@
+{
+	"n_targets": 9841,
+	"n_bootstraps": 0,
+	"n_processed": 13909250,
+	"kallisto_version": "0.43.1",
+	"index_version": 10,
+	"start_time": "Wed Jan 10 13:15:07 2018",
+	"call": "kallisto quant -i genome/Afumigatus_Af293.kallisto.idx -o results/kallisto/eefA_OE.Hypoxia.r3 -t 8 --bias --single -l 300 --sd 20 data/180109_DA003/S18_S18_L001_R1_001.fastq.gz data/180109_DA003/S18_S18_L002_R1_001.fastq.gz data/180109_DA003/S18_S18_L003_R1_001.fastq.gz data/180109_DA003/S18_S18_L004_R1_001.fastq.gz"
+}
