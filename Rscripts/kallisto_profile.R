@@ -8,7 +8,7 @@ library(pheatmap)
 library(RColorBrewer)
 
 samples <- read.csv("samples.csv",header=TRUE)
-exprnames <- do.call(paste,c(samples[c("Strain","Condition","Rep")],sep="."))
+exprnames <- do.call(paste,c(samples[c("Strain","Condition","Replicate")],sep="."))
 exprnames <- sub(".([123])$",".r\\1",exprnames,perl=TRUE)
 files <- file.path("results","kallisto",exprnames,"abundance.h5")
 txi.kallisto <- tximport(files, type = "kallisto", txOut = TRUE)
@@ -50,12 +50,22 @@ ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
   coord_fixed() + facet_grid( . ~ transformation)
 
 select <- order(rowMeans(counts(dds,normalized=TRUE)),
-                decreasing=TRUE)[1:60]
+                decreasing=TRUE)[1:75]
 df <- as.data.frame(colData(dds)[,c("condition","genotype")])
+rownames(df) = exprnames
+colnames(df) = c("Condition","Genotype")
+
 pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df,main="VSD")
+         cluster_cols=FALSE, annotation_col=df,main="VSD ordered")
 
+topVar <- head(order(rowVars(assay(vsd)),
+                                decreasing=TRUE),60)
+mat  <- assay(vsd)[ topVar, ]
+mat  <- mat - rowMeans(mat)
+pheatmap(mat, show_rownames=TRUE,
+         fontsize_row = 7,fontsize_col = 7,
+         cluster_cols=FALSE, annotation_col=df,main="VSD - most different")
 
 pheatmap(assay(rld)[select,], cluster_rows=FALSE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,

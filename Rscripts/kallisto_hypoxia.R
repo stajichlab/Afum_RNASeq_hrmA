@@ -24,11 +24,11 @@ rep = factor( samples$Replicate)
 #treatment = factor (samples$Condition)
 
 #condition = treatment,
-sampleTable <- data.frame(genotype = geno, replicate = rep)
+sampleTable <- data.frame(genotype = geno)
 rownames(sampleTable) = exprnames
 
 #dds <- DESeqDataSetFromTximport(txi.kallisto,sampleTable,~ condition + genotype)
-dds <- DESeqDataSetFromTximport(txi.kallisto,sampleTable,~ genotype)
+dds <- DESeqDataSetFromTximport(txi.kallisto,sampleTable, ~ genotype)
 
 #nrow(dds)
 dds <- dds[ rowSums(counts(dds)) > 1, ]
@@ -52,15 +52,39 @@ ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
   coord_fixed() + facet_grid( . ~ transformation)
 
 select <- order(rowMeans(counts(dds,normalized=TRUE)),
-                decreasing=TRUE)[1:60]
+                decreasing=TRUE)[1:50]
 df <- as.data.frame(colData(dds)[,c("genotype")])
+rownames(df) = exprnames
+colnames(df) = c("Genotype")
 pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
          cluster_cols=FALSE, annotation_col=df,main="VSD")
 
+topVar <- head(order(rowVars(assay(vsd)),
+          decreasing=TRUE),60)
+mat  <- assay(vsd)[ topVar, ]
+mat  <- mat - rowMeans(mat)
+#controlAve <- rowMeans(mat[ , genotype == "AF293" ])
+
+pheatmap(mat, show_rownames=TRUE,
+        fontsize_row = 7,fontsize_col = 7,
+        cluster_cols=FALSE, annotation_col=df,main="VSD Most different")
+
+
+
 pheatmap(assay(rld)[select,], cluster_rows=FALSE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
          cluster_cols=FALSE, annotation_col=df,main="RLD")
+
+topVar <- head(order(rowVars(assay(rld)),
+    decreasing=TRUE),60)
+mat  <- assay(rld)[ topVar, ]
+mat  <- mat - rowMeans(mat)
+pheatmap(mat, show_rownames=TRUE,
+         fontsize_row = 7,fontsize_col = 7,
+         cluster_cols=FALSE, annotation_col=df,main="RLD Most different")
+
+
 
 sampleDists <- dist(t(assay(vsd)))
 sampleDistMatrix <- as.matrix(sampleDists)
@@ -76,7 +100,7 @@ pheatmap(sampleDistMatrix,
 pcaData <- plotPCA(vsd, intgroup=c("genotype"), returnData=TRUE)
 percentVar <- round(100 * attr(pcaData, "percentVar"))
 
-ggplot(pcaData, aes(PC1, PC2, color=genotype, shape=replicate)) +
+ggplot(pcaData, aes(PC1, PC2, color=genotype)) +
     geom_point(size=3) +
     xlab(paste0("PC1: ",percentVar[1],"% variance")) +
     ylab(paste0("PC2: ",percentVar[2],"% variance")) +
