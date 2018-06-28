@@ -1,0 +1,15 @@
+sample.ID,Strain,Condition,Replicate
+S4,AF293,Hypoxia,1
+S5,AF293,Hypoxia,2
+S6,AF293,Hypoxia,3
+S10,Delta_eefA_AF293,Hypoxia,1
+S11,Delta_eefA_AF293,Hypoxia,2
+S12,Delta_eefA_AF293,Hypoxia,3
+S16,eefA_OE,Hypoxia,1
+S17,eefA_OE,Hypoxia,2
+S18,eefA_OE,Hypoxia,3
+S22,eefA_REV,Hypoxia,1
+S24,eefA_REV,Hypoxia,3
+S28,EVOL,Hypoxia,1
+S29,EVOL,Hypoxia,2
+S30,EVOL,Hypoxia,3
