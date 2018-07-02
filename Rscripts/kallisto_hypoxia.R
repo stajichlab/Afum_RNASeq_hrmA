@@ -6,6 +6,9 @@ library(magrittr)
 library(Biobase)
 library(pheatmap)
 library(RColorBrewer)
+library(fdrtool)
+library(geneplotter)
+library(EDASeq)
 
 samples <- read.csv("samples_hypoxia_paper1.csv",header=TRUE)
 exprnames <- do.call(paste,c(samples[c("Strain","Condition","Replicate")],sep="."))
@@ -35,6 +38,8 @@ dds <- dds[ rowSums(counts(dds)) > 1, ]
 #nrow(dds)
 
 dds <- estimateSizeFactors(dds)
+dds <- estimateDispersions(dds)
+
 vsd <- vst(dds, blind=FALSE)
 rld <- rlog(dds, blind=FALSE)
 head(assay(vsd), 3)
@@ -48,33 +53,61 @@ df <- bind_rows(
 colnames(df)[1:2] <- c("x", "y")
 
 pdf("plots/Hypoxia_RNASeq_kallisto.pdf")
+
+plotDispEsts(dds)
+
+multidensity( counts(dds, normalized = T),
+              xlab="mean counts", xlim=c(0, 1000))
+multiecdf( counts(dds, normalized = T),
+           xlab="mean counts", xlim=c(0, 1000))
+
+MA.idx = t(combn(1:4, 2))
+for( i in  seq_along( MA.idx[,1])){ 
+  MDPlot(counts(dds, normalized = T), 
+         c(MA.idx[i,1],MA.idx[i,2]), 
+         main = paste( colnames(dds)[MA.idx[i,1]], " vs ",
+                       colnames(dds)[MA.idx[i,2]] ), ylim = c(-3,3))
+}
+
 ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
   coord_fixed() + facet_grid( . ~ transformation)
 
 select <- order(rowMeans(counts(dds,normalized=TRUE)),
                 decreasing=TRUE)[1:50]
-df <- as.data.frame(colData(dds)[,c("genotype")])
-rownames(df) = exprnames
-colnames(df) = c("Genotype")
+
+
+datCollapsed <- collapseReplicates(dds, groupby=dds$genotype,run=dds$replicate,renameCols=TRUE)
+
+df2 <- as.data.frame(colData(dds)[,c("genotype")])
+rownames(df2) = exprnames
+colnames(df2) = c("Genotype")
 pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df,main="VSD")
+         cluster_cols=FALSE, annotation_col=df2,main="VSD")
 
 topVar <- head(order(rowVars(assay(vsd)),
           decreasing=TRUE),60)
 mat  <- assay(vsd)[ topVar, ]
 mat  <- mat - rowMeans(mat)
-#controlAve <- rowMeans(mat[ , genotype == "AF293" ])
+
+mat2  <- assay(vsd)[ topVar, ]
+
+controlAve <- rowMeans(mat2[ , Genotype == "AF293" ])
 
 pheatmap(mat, show_rownames=TRUE,
         fontsize_row = 7,fontsize_col = 7,
-        cluster_cols=FALSE, annotation_col=df,main="VSD Most different")
+        cluster_cols=FALSE, annotation_col=df2,main="VSD Most different")
+
+pheatmap(datCollapsed, show_rownames=TRUE,
+         fontsize_row = 7,fontsize_col = 7,
+         cluster_cols=FALSE, annotation_col=df2,main="VSD Normalized to Af293")
+
 
 
 
 pheatmap(assay(rld)[select,], cluster_rows=FALSE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df,main="RLD")
+         cluster_cols=FALSE, annotation_col=df2,main="RLD")
 
 topVar <- head(order(rowVars(assay(rld)),
     decreasing=TRUE),60)
@@ -82,7 +115,7 @@ mat  <- assay(rld)[ topVar, ]
 mat  <- mat - rowMeans(mat)
 pheatmap(mat, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df,main="RLD Most different")
+         cluster_cols=FALSE, annotation_col=df2,main="RLD Most different")
 
 
 
