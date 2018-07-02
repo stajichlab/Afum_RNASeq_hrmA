@@ -1,4 +1,4 @@
-SampleID,Strain,Condition,Rep
+sample.ID,Strain,Condition,Replicate
 S1,AF293,Normoxia,1
 S2,AF293,Normoxia,2
 S3,AF293,Normoxia,3
