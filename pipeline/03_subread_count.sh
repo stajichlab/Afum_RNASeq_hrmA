@@ -30,14 +30,8 @@ fi
 OUTFILE=$OUTDIR/Hypoxia.Af293.gsnap_reads.MM.nostrand.tab
 if [ ! -f $OUTFILE ]; then
     featureCounts -g gene_id -T $CPUS -G $GENOME -s 0 -a $GFF \
-        --tmpDir $TEMP -M -primary \
+        --tmpDir $TEMP -M --primary \
 	-o $OUTFILE -F GTF $INDIR/*.bam
 fi
 
-OUTFILE=$OUTDIR/Hypoxia.Af293.gsnap_frags.nostrand.tab
-if [ ! -f $OUTFILE ]; then
-    featureCounts -g gene_id -T $CPUS -G $GENOME -s 2 -a $GFF \
-        --tmpDir $TEMP \
-	-o $OUTFILE -F GTF -p $INDIR/*.bam
-fi
 

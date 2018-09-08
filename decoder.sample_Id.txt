@@ -1,0 +1,11 @@
+sample.ID	Strain	Condition
+AF293.Normoxia	AF293	Normoxia
+AF293.Hypoxia	AF293	Hypoxia
+Delta_eefA_AF293.Normoxia	Delta_eefA_AF293	Normoxia
+Delta_eefA_AF293.Hypoxia	Delta_eefA_AF293	Hypoxia
+eefA_OE.Normoxia	eefA_OE	Normoxia
+eefA_OE.Hypoxia	eefA_OE	Hypoxia
+eefA_REV.Normoxia	eefA_REV	Normoxia
+eefA_REV.Hypoxia	eefA_REV	Hypoxia
+EVOL.Normoxia	EVOL	Normoxia
+EVOL.Hypoxia	EVOL	Hypoxia
