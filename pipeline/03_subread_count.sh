@@ -6,7 +6,7 @@ module load subread
 
 # transcript file was updated to recover missing genes
 GFF=genome/Afumigatus_Af293.gtf
-OUTDIR=reports
+OUTDIR=results/gsnap_subread
 INDIR=aln
 GENOME=genome/AfumigatusAf293_Genome.fasta
 GENOMENAME=Afum_Af293 # so we can easily switch to a different reference
@@ -19,18 +19,18 @@ CPUS=$SLURM_CPUS_ON_NODE
 
 IFS=,
 
-OUTFILE=$OUTDIR/Hypoxia.Af293.gsnap_reads.nostrand.tab
+OUTFILE=$OUTDIR/hrmA.Af293.gsnap_reads.tab
 
 if [ ! -f $OUTFILE ]; then
     featureCounts -g gene_id -T $CPUS -G $GENOME -s 0 -a $GFF \
-        --tmpDir $TEMP \
+        --tmpDir $TEMP -J \
 	-o $OUTFILE -F GTF $INDIR/*.bam
 fi
 
-OUTFILE=$OUTDIR/Hypoxia.Af293.gsnap_reads.MM.nostrand.tab
+OUTFILE=$OUTDIR/hrmA.Af293.gsnap_reads.MM.tab
 if [ ! -f $OUTFILE ]; then
     featureCounts -g gene_id -T $CPUS -G $GENOME -s 0 -a $GFF \
-        --tmpDir $TEMP -M --primary \
+        --tmpDir $TEMP -M --primary -J \
 	-o $OUTFILE -F GTF $INDIR/*.bam
 fi
 
