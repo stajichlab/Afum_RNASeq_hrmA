@@ -1,0 +1,575 @@
+
+        ==========     _____ _    _ ____  _____  ______          _____  
+        =====         / ____| |  | |  _ \|  __ \|  ____|   /\   |  __ \ 
+          =====      | (___ | |  | | |_) | |__) | |__     /  \  | |  | |
+            ====      \___ \| |  | |  _ <|  _  /|  __|   / /\ \ | |  | |
+              ====    ____) | |__| | |_) | | \ \| |____ / ____ \| |__| |
+        ==========   |_____/ \____/|____/|_|  \_\______/_/    \_\_____/
+	  v1.6.2
+
+//========================== featureCounts setting ===========================\\
+||                                                                            ||
+||             Input files : 30 BAM files                                     ||
+||                           S AF293_Hypoxia.r1.gsnap_Afum_Af293.bam          ||
+||                           S AF293_Hypoxia.r2.gsnap_Afum_Af293.bam          ||
+||                           S AF293_Hypoxia.r3.gsnap_Afum_Af293.bam          ||
+||                           S AF293_Normoxia.r1.gsnap_Afum_Af293.bam         ||
+||                           S AF293_Normoxia.r2.gsnap_Afum_Af293.bam         ||
+||                           S AF293_Normoxia.r3.gsnap_Afum_Af293.bam         ||
+||                           S Delta_eefA_AF293_Hypoxia.r1.gsnap_Afum_Af2 ... ||
+||                           S Delta_eefA_AF293_Hypoxia.r2.gsnap_Afum_Af2 ... ||
+||                           S Delta_eefA_AF293_Hypoxia.r3.gsnap_Afum_Af2 ... ||
+||                           S Delta_eefA_AF293_Normoxia.r1.gsnap_Afum_Af ... ||
+||                           S Delta_eefA_AF293_Normoxia.r2.gsnap_Afum_Af ... ||
+||                           S Delta_eefA_AF293_Normoxia.r3.gsnap_Afum_Af ... ||
+||                           S EVOL_Hypoxia.r1.gsnap_Afum_Af293.bam           ||
+||                           S EVOL_Hypoxia.r2.gsnap_Afum_Af293.bam           ||
+||                           S EVOL_Hypoxia.r3.gsnap_Afum_Af293.bam           ||
+||                           S EVOL_Normoxia.r1.gsnap_Afum_Af293.bam          ||
+||                           S EVOL_Normoxia.r2.gsnap_Afum_Af293.bam          ||
+||                           S EVOL_Normoxia.r3.gsnap_Afum_Af293.bam          ||
+||                           S eefA_OE_Hypoxia.r1.gsnap_Afum_Af293.bam        ||
+||                           S eefA_OE_Hypoxia.r2.gsnap_Afum_Af293.bam        ||
+||                           S eefA_OE_Hypoxia.r3.gsnap_Afum_Af293.bam        ||
+||                           S eefA_OE_Normoxia.r1.gsnap_Afum_Af293.bam       ||
+||                           S eefA_OE_Normoxia.r2.gsnap_Afum_Af293.bam       ||
+||                           S eefA_OE_Normoxia.r3.gsnap_Afum_Af293.bam       ||
+||                           S eefA_REV_Hypoxia.r1.gsnap_Afum_Af293.bam       ||
+||                           S eefA_REV_Hypoxia.r2.gsnap_Afum_Af293.bam       ||
+||                           S eefA_REV_Hypoxia.r3.gsnap_Afum_Af293.bam       ||
+||                           S eefA_REV_Normoxia.r1.gsnap_Afum_Af293.bam      ||
+||                           S eefA_REV_Normoxia.r2.gsnap_Afum_Af293.bam      ||
+||                           S eefA_REV_Normoxia.r3.gsnap_Afum_Af293.bam      ||
+||                                                                            ||
+||             Output file : hrmA.Af293.gsnap_reads.tab                       ||
+||                 Summary : hrmA.Af293.gsnap_reads.tab.summary               ||
+||              Annotation : Afumigatus_Af293.gtf (GTF)                       ||
+||       Junction Counting : <output_file>.jcounts                            ||
+||      Dir for temp files : /scratch                                         ||
+||                                                                            ||
+||                 Threads : 8                                                ||
+||                   Level : meta-feature level                               ||
+||              Paired-end : no                                               ||
+||      Multimapping reads : not counted                                      ||
+|| Multi-overlapping reads : not counted                                      ||
+||   Min overlapping bases : 1                                                ||
+||                                                                            ||
+\\===================== http://subread.sourceforge.net/ ======================//
+
+//================================= Running ==================================\\
+||                                                                            ||
+|| Load annotation file Afumigatus_Af293.gtf ...                              ||
+||    Features : 31786                                                        ||
+||    Meta-features : 10130                                                   ||
+||    Chromosomes/contigs : 9                                                 ||
+||                                                                            ||
+|| Loading FASTA contigs : genome/AfumigatusAf293_Genome.fasta                ||
+||    9 contigs were loaded                                                   ||
+||                                                                            ||
+|| Process BAM file AF293_Hypoxia.r1.gsnap_Afum_Af293.bam...                  ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 18786895                                                  ||
+||    Successfully assigned reads : 15185664 (80.8%)                          ||
+||    Running time : 0.13 minutes                                             ||
+||                                                                            ||
+|| Process BAM file AF293_Hypoxia.r2.gsnap_Afum_Af293.bam...                  ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10084869                                                  ||
+||    Successfully assigned reads : 7339444 (72.8%)                           ||
+||    Running time : 0.08 minutes                                             ||
+||                                                                            ||
+|| Process BAM file AF293_Hypoxia.r3.gsnap_Afum_Af293.bam...                  ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 12716786                                                  ||
+||    Successfully assigned reads : 9722525 (76.5%)                           ||
+||    Running time : 0.09 minutes                                             ||
+||                                                                            ||
+|| Process BAM file AF293_Normoxia.r1.gsnap_Afum_Af293.bam...                 ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 16009632                                                  ||
+||    Successfully assigned reads : 13514593 (84.4%)                          ||
+||    Running time : 0.12 minutes                                             ||
+||                                                                            ||
+|| Process BAM file AF293_Normoxia.r2.gsnap_Afum_Af293.bam...                 ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 16807965                                                  ||
+||    Successfully assigned reads : 14420036 (85.8%)                          ||
+||    Running time : 0.12 minutes                                             ||
+||                                                                            ||
+|| Process BAM file AF293_Normoxia.r3.gsnap_Afum_Af293.bam...                 ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 14086871                                                  ||
+||    Successfully assigned reads : 11954775 (84.9%)                          ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Delta_eefA_AF293_Hypoxia.r1.gsnap_Afum_Af293.bam...       ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13433558                                                  ||
+||    Successfully assigned reads : 10794472 (80.4%)                          ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Delta_eefA_AF293_Hypoxia.r2.gsnap_Afum_Af293.bam...       ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10476033                                                  ||
+||    Successfully assigned reads : 8500368 (81.1%)                           ||
+||    Running time : 0.07 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Delta_eefA_AF293_Hypoxia.r3.gsnap_Afum_Af293.bam...       ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 23040854                                                  ||
+||    Successfully assigned reads : 18268852 (79.3%)                          ||
+||    Running time : 0.15 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Delta_eefA_AF293_Normoxia.r1.gsnap_Afum_Af293.bam...      ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13670878                                                  ||
+||    Successfully assigned reads : 11420554 (83.5%)                          ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Delta_eefA_AF293_Normoxia.r2.gsnap_Afum_Af293.bam...      ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 15650414                                                  ||
+||    Successfully assigned reads : 13119152 (83.8%)                          ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Delta_eefA_AF293_Normoxia.r3.gsnap_Afum_Af293.bam...      ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13307246                                                  ||
+||    Successfully assigned reads : 11327945 (85.1%)                          ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Process BAM file EVOL_Hypoxia.r1.gsnap_Afum_Af293.bam...                   ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 12522095                                                  ||
+||    Successfully assigned reads : 8022373 (64.1%)                           ||
+||    Running time : 0.08 minutes                                             ||
+||                                                                            ||
+|| Process BAM file EVOL_Hypoxia.r2.gsnap_Afum_Af293.bam...                   ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10679600                                                  ||
+||    Successfully assigned reads : 6684955 (62.6%)                           ||
+||    Running time : 0.08 minutes                                             ||
+||                                                                            ||
+|| Process BAM file EVOL_Hypoxia.r3.gsnap_Afum_Af293.bam...                   ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 8853614                                                   ||
+||    Successfully assigned reads : 5454465 (61.6%)                           ||
+||    Running time : 0.06 minutes                                             ||
+||                                                                            ||
+|| Process BAM file EVOL_Normoxia.r1.gsnap_Afum_Af293.bam...                  ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 16232733                                                  ||
+||    Successfully assigned reads : 13294466 (81.9%)                          ||
+||    Running time : 0.12 minutes                                             ||
+||                                                                            ||
+|| Process BAM file EVOL_Normoxia.r2.gsnap_Afum_Af293.bam...                  ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 15633399                                                  ||
+||    Successfully assigned reads : 12800433 (81.9%)                          ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file EVOL_Normoxia.r3.gsnap_Afum_Af293.bam...                  ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 14949783                                                  ||
+||    Successfully assigned reads : 11202021 (74.9%)                          ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_OE_Hypoxia.r1.gsnap_Afum_Af293.bam...                ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 9419905                                                   ||
+||    Successfully assigned reads : 7071157 (75.1%)                           ||
+||    Running time : 0.07 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_OE_Hypoxia.r2.gsnap_Afum_Af293.bam...                ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13245122                                                  ||
+||    Successfully assigned reads : 9980284 (75.4%)                           ||
+||    Running time : 0.09 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_OE_Hypoxia.r3.gsnap_Afum_Af293.bam...                ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 15571471                                                  ||
+||    Successfully assigned reads : 11028276 (70.8%)                          ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_OE_Normoxia.r1.gsnap_Afum_Af293.bam...               ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 12154407                                                  ||
+||    Successfully assigned reads : 10057733 (82.7%)                          ||
+||    Running time : 0.09 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_OE_Normoxia.r2.gsnap_Afum_Af293.bam...               ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10524890                                                  ||
+||    Successfully assigned reads : 8288588 (78.8%)                           ||
+||    Running time : 0.08 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_OE_Normoxia.r3.gsnap_Afum_Af293.bam...               ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 11629044                                                  ||
+||    Successfully assigned reads : 9513344 (81.8%)                           ||
+||    Running time : 0.08 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_REV_Hypoxia.r1.gsnap_Afum_Af293.bam...               ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10395286                                                  ||
+||    Successfully assigned reads : 7510740 (72.3%)                           ||
+||    Running time : 0.08 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_REV_Hypoxia.r2.gsnap_Afum_Af293.bam...               ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 7171475                                                   ||
+||    Successfully assigned reads : 5139133 (71.7%)                           ||
+||    Running time : 0.05 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_REV_Hypoxia.r3.gsnap_Afum_Af293.bam...               ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 14557859                                                  ||
+||    Successfully assigned reads : 11668030 (80.1%)                          ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_REV_Normoxia.r1.gsnap_Afum_Af293.bam...              ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10915040                                                  ||
+||    Successfully assigned reads : 8987440 (82.3%)                           ||
+||    Running time : 0.08 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_REV_Normoxia.r2.gsnap_Afum_Af293.bam...              ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 8749650                                                   ||
+||    Successfully assigned reads : 6976095 (79.7%)                           ||
+||    Running time : 0.07 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_REV_Normoxia.r3.gsnap_Afum_Af293.bam...              ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 11379641                                                  ||
+||    Successfully assigned reads : 9089722 (79.9%)                           ||
+||    Running time : 0.08 minutes                                             ||
+||                                                                            ||
+||               Found 161072 junctions in all the input files.               ||
+||                                                                            ||
+||                         Read assignment finished.                          ||
+||                                                                            ||
+|| Summary of counting results can be found in file "results/gsnap_subread/h  ||
+|| rmA.Af293.gsnap_reads.tab.summary"                                         ||
+||                                                                            ||
+\\===================== http://subread.sourceforge.net/ ======================//
+
+
+        ==========     _____ _    _ ____  _____  ______          _____  
+        =====         / ____| |  | |  _ \|  __ \|  ____|   /\   |  __ \ 
+          =====      | (___ | |  | | |_) | |__) | |__     /  \  | |  | |
+            ====      \___ \| |  | |  _ <|  _  /|  __|   / /\ \ | |  | |
+              ====    ____) | |__| | |_) | | \ \| |____ / ____ \| |__| |
+        ==========   |_____/ \____/|____/|_|  \_\______/_/    \_\_____/
+	  v1.6.2
+
+//========================== featureCounts setting ===========================\\
+||                                                                            ||
+||             Input files : 30 BAM files                                     ||
+||                           S AF293_Hypoxia.r1.gsnap_Afum_Af293.bam          ||
+||                           S AF293_Hypoxia.r2.gsnap_Afum_Af293.bam          ||
+||                           S AF293_Hypoxia.r3.gsnap_Afum_Af293.bam          ||
+||                           S AF293_Normoxia.r1.gsnap_Afum_Af293.bam         ||
+||                           S AF293_Normoxia.r2.gsnap_Afum_Af293.bam         ||
+||                           S AF293_Normoxia.r3.gsnap_Afum_Af293.bam         ||
+||                           S Delta_eefA_AF293_Hypoxia.r1.gsnap_Afum_Af2 ... ||
+||                           S Delta_eefA_AF293_Hypoxia.r2.gsnap_Afum_Af2 ... ||
+||                           S Delta_eefA_AF293_Hypoxia.r3.gsnap_Afum_Af2 ... ||
+||                           S Delta_eefA_AF293_Normoxia.r1.gsnap_Afum_Af ... ||
+||                           S Delta_eefA_AF293_Normoxia.r2.gsnap_Afum_Af ... ||
+||                           S Delta_eefA_AF293_Normoxia.r3.gsnap_Afum_Af ... ||
+||                           S EVOL_Hypoxia.r1.gsnap_Afum_Af293.bam           ||
+||                           S EVOL_Hypoxia.r2.gsnap_Afum_Af293.bam           ||
+||                           S EVOL_Hypoxia.r3.gsnap_Afum_Af293.bam           ||
+||                           S EVOL_Normoxia.r1.gsnap_Afum_Af293.bam          ||
+||                           S EVOL_Normoxia.r2.gsnap_Afum_Af293.bam          ||
+||                           S EVOL_Normoxia.r3.gsnap_Afum_Af293.bam          ||
+||                           S eefA_OE_Hypoxia.r1.gsnap_Afum_Af293.bam        ||
+||                           S eefA_OE_Hypoxia.r2.gsnap_Afum_Af293.bam        ||
+||                           S eefA_OE_Hypoxia.r3.gsnap_Afum_Af293.bam        ||
+||                           S eefA_OE_Normoxia.r1.gsnap_Afum_Af293.bam       ||
+||                           S eefA_OE_Normoxia.r2.gsnap_Afum_Af293.bam       ||
+||                           S eefA_OE_Normoxia.r3.gsnap_Afum_Af293.bam       ||
+||                           S eefA_REV_Hypoxia.r1.gsnap_Afum_Af293.bam       ||
+||                           S eefA_REV_Hypoxia.r2.gsnap_Afum_Af293.bam       ||
+||                           S eefA_REV_Hypoxia.r3.gsnap_Afum_Af293.bam       ||
+||                           S eefA_REV_Normoxia.r1.gsnap_Afum_Af293.bam      ||
+||                           S eefA_REV_Normoxia.r2.gsnap_Afum_Af293.bam      ||
+||                           S eefA_REV_Normoxia.r3.gsnap_Afum_Af293.bam      ||
+||                                                                            ||
+||             Output file : hrmA.Af293.gsnap_reads.MM.tab                    ||
+||                 Summary : hrmA.Af293.gsnap_reads.MM.tab.summary            ||
+||              Annotation : Afumigatus_Af293.gtf (GTF)                       ||
+||       Junction Counting : <output_file>.jcounts                            ||
+||      Dir for temp files : /scratch                                         ||
+||                                                                            ||
+||                 Threads : 8                                                ||
+||                   Level : meta-feature level                               ||
+||              Paired-end : no                                               ||
+||      Multimapping reads : counted                                          ||
+||     Multiple alignments : primary alignment only                           ||
+|| Multi-overlapping reads : not counted                                      ||
+||   Min overlapping bases : 1                                                ||
+||                                                                            ||
+\\===================== http://subread.sourceforge.net/ ======================//
+
+//================================= Running ==================================\\
+||                                                                            ||
+|| Load annotation file Afumigatus_Af293.gtf ...                              ||
+||    Features : 31786                                                        ||
+||    Meta-features : 10130                                                   ||
+||    Chromosomes/contigs : 9                                                 ||
+||                                                                            ||
+|| Loading FASTA contigs : genome/AfumigatusAf293_Genome.fasta                ||
+||    9 contigs were loaded                                                   ||
+||                                                                            ||
+|| Process BAM file AF293_Hypoxia.r1.gsnap_Afum_Af293.bam...                  ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 18786895                                                  ||
+||    Successfully assigned reads : 15361780 (81.8%)                          ||
+||    Running time : 0.14 minutes                                             ||
+||                                                                            ||
+|| Process BAM file AF293_Hypoxia.r2.gsnap_Afum_Af293.bam...                  ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10084869                                                  ||
+||    Successfully assigned reads : 7807073 (77.4%)                           ||
+||    Running time : 0.08 minutes                                             ||
+||                                                                            ||
+|| Process BAM file AF293_Hypoxia.r3.gsnap_Afum_Af293.bam...                  ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 12716786                                                  ||
+||    Successfully assigned reads : 9857805 (77.5%)                           ||
+||    Running time : 0.09 minutes                                             ||
+||                                                                            ||
+|| Process BAM file AF293_Normoxia.r1.gsnap_Afum_Af293.bam...                 ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 16009632                                                  ||
+||    Successfully assigned reads : 13672975 (85.4%)                          ||
+||    Running time : 0.13 minutes                                             ||
+||                                                                            ||
+|| Process BAM file AF293_Normoxia.r2.gsnap_Afum_Af293.bam...                 ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 16807965                                                  ||
+||    Successfully assigned reads : 14588728 (86.8%)                          ||
+||    Running time : 0.12 minutes                                             ||
+||                                                                            ||
+|| Process BAM file AF293_Normoxia.r3.gsnap_Afum_Af293.bam...                 ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 14086871                                                  ||
+||    Successfully assigned reads : 12096378 (85.9%)                          ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Delta_eefA_AF293_Hypoxia.r1.gsnap_Afum_Af293.bam...       ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13433558                                                  ||
+||    Successfully assigned reads : 10944784 (81.5%)                          ||
+||    Running time : 0.09 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Delta_eefA_AF293_Hypoxia.r2.gsnap_Afum_Af293.bam...       ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10476033                                                  ||
+||    Successfully assigned reads : 8638999 (82.5%)                           ||
+||    Running time : 0.07 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Delta_eefA_AF293_Hypoxia.r3.gsnap_Afum_Af293.bam...       ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 23040854                                                  ||
+||    Successfully assigned reads : 18455679 (80.1%)                          ||
+||    Running time : 0.15 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Delta_eefA_AF293_Normoxia.r1.gsnap_Afum_Af293.bam...      ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13670878                                                  ||
+||    Successfully assigned reads : 11548355 (84.5%)                          ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Delta_eefA_AF293_Normoxia.r2.gsnap_Afum_Af293.bam...      ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 15650414                                                  ||
+||    Successfully assigned reads : 13298349 (85.0%)                          ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Delta_eefA_AF293_Normoxia.r3.gsnap_Afum_Af293.bam...      ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13307246                                                  ||
+||    Successfully assigned reads : 11441663 (86.0%)                          ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Process BAM file EVOL_Hypoxia.r1.gsnap_Afum_Af293.bam...                   ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 12522095                                                  ||
+||    Successfully assigned reads : 9312417 (74.4%)                           ||
+||    Running time : 0.09 minutes                                             ||
+||                                                                            ||
+|| Process BAM file EVOL_Hypoxia.r2.gsnap_Afum_Af293.bam...                   ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10679600                                                  ||
+||    Successfully assigned reads : 7806924 (73.1%)                           ||
+||    Running time : 0.08 minutes                                             ||
+||                                                                            ||
+|| Process BAM file EVOL_Hypoxia.r3.gsnap_Afum_Af293.bam...                   ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 8853614                                                   ||
+||    Successfully assigned reads : 6324885 (71.4%)                           ||
+||    Running time : 0.07 minutes                                             ||
+||                                                                            ||
+|| Process BAM file EVOL_Normoxia.r1.gsnap_Afum_Af293.bam...                  ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 16232733                                                  ||
+||    Successfully assigned reads : 13548263 (83.5%)                          ||
+||    Running time : 0.13 minutes                                             ||
+||                                                                            ||
+|| Process BAM file EVOL_Normoxia.r2.gsnap_Afum_Af293.bam...                  ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 15633399                                                  ||
+||    Successfully assigned reads : 13096158 (83.8%)                          ||
+||    Running time : 0.12 minutes                                             ||
+||                                                                            ||
+|| Process BAM file EVOL_Normoxia.r3.gsnap_Afum_Af293.bam...                  ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 14949783                                                  ||
+||    Successfully assigned reads : 11759707 (78.7%)                          ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_OE_Hypoxia.r1.gsnap_Afum_Af293.bam...                ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 9419905                                                   ||
+||    Successfully assigned reads : 7248080 (76.9%)                           ||
+||    Running time : 0.07 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_OE_Hypoxia.r2.gsnap_Afum_Af293.bam...                ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13245122                                                  ||
+||    Successfully assigned reads : 10224415 (77.2%)                          ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_OE_Hypoxia.r3.gsnap_Afum_Af293.bam...                ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 15571471                                                  ||
+||    Successfully assigned reads : 11221678 (72.1%)                          ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_OE_Normoxia.r1.gsnap_Afum_Af293.bam...               ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 12154407                                                  ||
+||    Successfully assigned reads : 10238827 (84.2%)                          ||
+||    Running time : 0.09 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_OE_Normoxia.r2.gsnap_Afum_Af293.bam...               ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10524890                                                  ||
+||    Successfully assigned reads : 8424538 (80.0%)                           ||
+||    Running time : 0.08 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_OE_Normoxia.r3.gsnap_Afum_Af293.bam...               ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 11629044                                                  ||
+||    Successfully assigned reads : 9624519 (82.8%)                           ||
+||    Running time : 0.09 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_REV_Hypoxia.r1.gsnap_Afum_Af293.bam...               ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10395286                                                  ||
+||    Successfully assigned reads : 7660323 (73.7%)                           ||
+||    Running time : 0.07 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_REV_Hypoxia.r2.gsnap_Afum_Af293.bam...               ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 7171475                                                   ||
+||    Successfully assigned reads : 5280129 (73.6%)                           ||
+||    Running time : 0.06 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_REV_Hypoxia.r3.gsnap_Afum_Af293.bam...               ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 14557859                                                  ||
+||    Successfully assigned reads : 11852272 (81.4%)                          ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_REV_Normoxia.r1.gsnap_Afum_Af293.bam...              ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10915040                                                  ||
+||    Successfully assigned reads : 9053093 (82.9%)                           ||
+||    Running time : 0.09 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_REV_Normoxia.r2.gsnap_Afum_Af293.bam...              ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 8749650                                                   ||
+||    Successfully assigned reads : 7047079 (80.5%)                           ||
+||    Running time : 0.07 minutes                                             ||
+||                                                                            ||
+|| Process BAM file eefA_REV_Normoxia.r3.gsnap_Afum_Af293.bam...              ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 11379641                                                  ||
+||    Successfully assigned reads : 9166353 (80.6%)                           ||
+||    Running time : 0.09 minutes                                             ||
+||                                                                            ||
+||               Found 161072 junctions in all the input files.               ||
+||                                                                            ||
+||                         Read assignment finished.                          ||
+||                                                                            ||
+|| Summary of counting results can be found in file "results/gsnap_subread/h  ||
+|| rmA.Af293.gsnap_reads.MM.tab.summary"                                      ||
+||                                                                            ||
+\\===================== http://subread.sourceforge.net/ ======================//
+
