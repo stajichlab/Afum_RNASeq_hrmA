@@ -182,3 +182,10 @@ plotMA(res, ylim=c(-2,2))
 plotMA(resLFC, ylim=c(-2,2))
 
 
+topChange <- head(resLFC[order(resLFC$log2FoldChange,decreasing=FALSE),],100)
+topChangePlot =  data.frame(log2FoldChange = topChange$log2FoldChange)
+rownames(topChangePlot) = rownames(topChange)
+pheatmap(topChangePlot,method="complete",main = "Fold Change Plot Down", show_rownames = T,show_colnames=F,
+         cluster_rows=FALSE,cluster_cols=FALSE,cexRow=0.3,legend=T, cexRow=0.3,
+         fontsize_row = 6)
+
