@@ -12,22 +12,25 @@ library(EDASeq)
 
 my_pal2 = mypal2 <- colorRampPalette(brewer.pal(6, "YlOrRd"))
 
-countdata <- read.table("reports/Hypoxia.Af293.gsnap_reads.nostrand.tab", header=TRUE, row.names=1)
+countdata <- read.table("results/gsnap_subread/hrmA.Af293.gsnap_reads.tab", header=TRUE, row.names=1)
 colnames(countdata) <- gsub("\\.gsnap_Afum_Af293\\.[sb]am$", "", colnames(countdata))
 colnames(countdata) <- gsub("aln\\.", "", colnames(countdata))
+
 countdata <- countdata[ ,6:ncol(countdata)]
 countdata <- as.matrix(countdata)
 head(countdata)
 
 samples <- read.csv("samples.csv",header=TRUE)
+samples = samples[-c(23),] # remove a bad sample
 exprnames <- do.call(paste,c(samples[c("Strain","Condition","Replicate")],sep="_"))
 exprnames <- sub(".([123])$",".r\\1",exprnames,perl=TRUE)
 
+#exprnames = exprnames[!exprnames %in% "hrmA_REV_Hypoxia.r2"]
+
 # check that experimental columns match in order
 all(exprnames %in% colnames(countdata))
-all(exprnames == colnames(countdata))
-
-# reorder the columns anyways... in case data change along the way
+#all(exprnames == colnames(countdata))
+# reorder the columns
 countdata <- countdata[,exprnames]
 all(exprnames == colnames(countdata))
 
@@ -91,9 +94,9 @@ select <- order(rowMeans(counts(dds,normalized=TRUE)),
 
 #datCollapsed <- collapseReplicates(dds, groupby=dds$genotype,run=dds$replicate,renameCols=TRUE)
 
-df2 <- as.data.frame(colData(dds)[,c("genotype")])
+df2 <- as.data.frame(colData(dds)[,c("condition","genotype")])
 rownames(df2) = exprnames
-colnames(df2) = c("Genotype")
+colnames(df2) = c("Hypoxia","Genotype")
 pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
          cluster_cols=FALSE, annotation_col=df2,main="VSD Top Expression")
@@ -135,20 +138,34 @@ pheatmap(sampleDistMatrix,
          clustering_distance_cols=sampleDists,
          col=colors)
 
-pcaData <- plotPCA(vsd, intgroup=c("genotype"), returnData=TRUE)
+pdf("plots/PCA_expresion.pdf")
+pcaData <- plotPCA(vsd, intgroup=c("genotype","condition","replicate"), returnData=TRUE)
 percentVar <- round(100 * attr(pcaData, "percentVar"))
 
-ggplot(pcaData, aes(PC1, PC2, color=genotype,shape=treatment)) +
+# FIX ME HERE
+ggplot(pcaData, aes(PC1, PC2, color=genotype,shape=treatment,label=treatment)) +
     geom_point(size=3) +
     xlab(paste0("PC1: ",percentVar[1],"% variance")) +
     ylab(paste0("PC2: ",percentVar[2],"% variance")) +
     coord_fixed() + theme_bw()
 
+ggplot(pcaData, aes(PC1, PC2, color=genotype,shape=replicate,label=treatment)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+  coord_fixed() + theme_bw()
+
+ggplot(pcaData, aes(PC1, PC2, color=genotype,shape=replicate,label=treatment)) +
+  geom_point(size=3) + geom_text(size=2) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+  coord_fixed() + theme_bw()
+
 
 norm.counts <- counts(dds, normalized=TRUE)
 log.norm.counts <- log2(norm.counts + 1)
 
-topVarGenes <- order(-rowVars(log.norm.counts)[0:1000])
+topVarGenes <- order(-rowVars(log.norm.counts)[0:100])
 mat<-log.norm.counts[topVarGenes,]
 mat<-mat -rowMeans(mat)
 
@@ -188,4 +205,26 @@ rownames(topChangePlot) = rownames(topChange)
 pheatmap(topChangePlot,method="complete",main = "Fold Change Plot Down", show_rownames = T,show_colnames=F,
          cluster_rows=FALSE,cluster_cols=FALSE,cexRow=0.3,legend=T, cexRow=0.3,
          fontsize_row = 6)
+
+dds <- DESeq(dds)
+res <- results(dds)
+res <- results(dds, contrast=c("condition","Normoxia","Hypoxia"))
+
+resLFC <- lfcShrink(dds, coef=2, type="apeglm")
+
+resOxiaFC <- lfcShrink(dds, coef="condition_Normoxia_vs_Hypoxia", type="apeglm")
+
+summary(resLFC)
+summary(resOxiaFC)
+
+# Get diff expressed
+resSig <- subset(resLFC, padj < 0.05)
+resSig <- resSig[order(resSig$pvalue),]
+write.csv(resSig,"reports/Normox_vs_Hypoxia.csv")
+write.csv(fpm(dds),"reports/FPM.csv")
+topresSig <- as.data.frame(head(resSig$log2FoldChange,50))
+colnames(topresSig) = c("log2FoldChange")
+pheatmap(topresSig, show_rownames=TRUE,show_colnames=FALSE,cluster_rows=FALSE,
+         fontsize_row = 6,fontsize_col = 7,width=5,cellwidth=10,
+         cluster_cols=FALSE, main="Log(2) fold change of Norm vs Hypoxia")
 
