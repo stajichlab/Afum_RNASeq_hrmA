@@ -24,6 +24,7 @@ library(geneplotter)
 library(GenomicFeatures)
 library(genefilter)
 
+
 #txdb <- makeTxDbFromGFF("genome/FungiDB-35_AfumigatusAf293.gff",
 #                        dataSource="FungiDB-35",
 #                        organism="Aspergillus fumigatus")
@@ -50,95 +51,288 @@ exprnames <- do.call(paste,c(samples[c("Strain","Condition","Replicate")],sep="_
 exprnames <- sub(".([123])$",".r\\1",exprnames,perl=TRUE)
 
 all(exprnames %in% colnames(countdata))
-#all(exprnames == colnames(countdata))
 # reorder the columns
 countdata <- countdata[,exprnames]
 all(exprnames == colnames(countdata))
 
 # DEseq2 analyses
 geno = factor( samples$Strain)
+geno = relevel(geno,"AF293")
 rep = factor( samples$Replicate)
-treatment = factor (samples$Condition)
+rep = relevel(rep, "1")
 
-sampleTable <- data.frame(condition = treatment,
-                          genotype = geno,
-                          replicate = rep
+treatment = factor (samples$Condition)
+treatment = relevel(treatment,"Hypoxia")
+
+sampleTable <- data.frame(genotype = geno,
+                          replicate = rep,
+                          condition = treatment
                           )
 rownames(sampleTable) = exprnames
 
-dds <- DESeqDataSetFromMatrix(countData = countdata,
+dds.oxy <- DESeqDataSetFromMatrix(countData = countdata,
                               colData   = sampleTable, 
-                              design    = genotype ~ condition )
+                              design    = ~condition)
+nrow(dds.oxy)
+dds.oxy <- dds.oxy[ rowSums(counts(dds.oxy)) > 1, ]
+nrow(dds.oxy)
 
-nrow(dds)
-dds <- dds[ rowSums(counts(dds)) > 1, ]
-nrow(dds)
+mcols(dds.oxy)$basepairs = gene_lengths[rownames(mcols(dds.oxy, use.names=TRUE))]
 
-mcols(dds)$basepairs = gene_lengths[rownames(mcols(dds, use.names=TRUE))]
+dds.oxy <- estimateSizeFactors(dds.oxy)
+dds.oxy <- estimateDispersions(dds.oxy)
 
-dds <- estimateSizeFactors(dds)
-dds <- estimateDispersions(dds)
-
-vsd <- vst(dds, blind=FALSE)
-rld <- rlog(dds, blind=FALSE)
-head(assay(vsd), 3)
-head(assay(rld), 3)
+vsd.oxy <- vst(dds.oxy, blind=FALSE)
+rld.oxy <- rlog(dds.oxy, blind=FALSE)
+head(assay(vsd.oxy), 3)
+head(assay(rld.oxy), 3)
 
 # test
-dds <- DESeq(dds)
-res <- results(dds)
-select <- order(res$padj,
+dds.oxy <- DESeq(dds.oxy)
+res.oxy <- results(dds.oxy)
+select <- order(res.oxy$padj,
                 decreasing=TRUE)[1:50]
-df2 <- as.data.frame(colData(dds)[,c("condition","genotype")])
+df2 <- as.data.frame(colData(dds.oxy)[,c("condition","genotype")])
 rownames(df2) = exprnames
-colnames(df2) = c("Genotype","Hypoxia")
-pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=TRUE,
+colnames(df2) = c("Condition","Genotype")
+pdf("plots/heatmaps_showing_replicates.pdf")
+pheatmap(assay(vsd.oxy)[select,], cluster_rows=TRUE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df2,main="VSD Top Expression")
+         cluster_cols=FALSE, annotation_col=df2,main="Oxy VSD Top Expression")
+
+pheatmap(assay(rld.oxy)[select,], cluster_rows=TRUE, show_rownames=TRUE,
+         fontsize_row = 7,fontsize_col = 7,
+         cluster_cols=FALSE, annotation_col=df2,main="Oxy RLD Top Expression")
+
 # end test
 
-dds <- DESeq(dds)
-res <- results(dds)
-res <- results(dds, contrast=c("condition","Normoxia","Hypoxia"))
+res.oxy <- results(dds.oxy, contrast=c("condition","Normoxia","Hypoxia"))
 
-resLFC <- lfcShrink(dds, coef=2, type="apeglm")
-summary(resLFC)
+resLFC.oxy <- lfcShrink(dds.oxy, coef=2, type="apeglm")
+summary(resLFC.oxy)
 
 # Get diff expressed
-resSig <- subset(resLFC, resLFC$padj < 0.05)
+resSig <- subset(resLFC.oxy, resLFC.oxy$padj < 0.01 & 
+                   abs(resLFC.oxy$log2FoldChange) > 2)
 resSig <- resSig[order(resSig$padj,decreasing=FALSE),]
-write.csv(resSig,"reports/subset1_Normox_vs_Hypoxia.csv")
-write.csv(fpm(dds),"reports/subset1_FPM.csv")
-write.csv(fpkm(dds),"reports/subset1_FPKM.csv")
+write.csv(resSig,"reports/subset1_condition_Normoxia_vs_Hypoxia.csv")
+write.csv(fpm(dds.oxy),"reports/subset1_FPM.csv")
+write.csv(fpkm(dds.oxy),"reports/subset1_FPKM.csv")
 
-dds$id <- factor(paste0(dds$genotype,".",dds$condition))
-dds.Coll <- collapseReplicates(dds,dds$id)
-colData(dds.Coll)
-vsd.Coll <- vst(dds.Coll, blind=FALSE)
+vsd.oxy.reorder <- assay(vsd.oxy)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
+                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
+                                     "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
+                                     "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
 
-dds.Coll <- DESeq(dds.Coll)
-res.Coll <- results(dds.Coll)
+rld.oxy.reorder <- assay(rld.oxy)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
+                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
+                                     "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
+                                     "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
 
-mcols(dds.Coll)$basepairs = gene_lengths[rownames(mcols(dds.Coll, use.names=TRUE))]
+pheatmap(rld.oxy.reorder[rownames(resSig),], cluster_rows=TRUE, show_rownames=FALSE,
+         fontsize_row = 7,fontsize_col = 7,
+         cluster_cols=FALSE, annotation_col=df2,main="RLD p<0.01 and 2-fold Exp Fold change Oxy")
 
-resSig.Coll <- subset(res.Coll,res.Coll$padj < 0.01)
-resSig.Coll <- resSig.Coll[order(resSig.Coll$padj,decreasing=FALSE),]
+pheatmap(vsd.oxy.reorder[rownames(resSig),], cluster_rows=TRUE, show_rownames=FALSE,
+         fontsize_row = 7,fontsize_col = 7,
+         cluster_cols=FALSE, annotation_col=df2,main="VSD p<0.01 and 2-fold Exp Fold change Oxy")
 
-write.csv(resSig.Coll,"reports/subset1_Collapsed_Normox_vs_Hypoxia.csv")
-write.csv(fpm(dds.Coll),"reports/subset1_Collapsed_FPM.csv")
-write.csv(fpkm(dds.Coll),"reports/subset1_Collapsed_FPKM.csv")
+# == now test for difference when using genotype
+dds.geno <- DESeqDataSetFromMatrix(countData = countdata,
+                                   colData   = sampleTable, 
+                                   design    = ~genotype)
 
-resBest.Coll <- subset(resSig.Coll,abs(resSig.Coll$log2FoldChange) > 2)
+nrow(dds.geno)
+dds.geno <- dds.geno[ rowSums(counts(dds.geno)) > 1, ]
+nrow(dds.geno)
 
-mat.Coll <- dds.Coll[ rownames(resBest.Coll), ]
-colconditions.Coll = as.data.frame(colData(dds.Coll)[,c("genotype","condition")])
+mcols(dds.geno)$basepairs = gene_lengths[rownames(mcols(dds.geno, use.names=TRUE))]
+
+dds.geno <- estimateSizeFactors(dds.geno)
+dds.geno <- estimateDispersions(dds.geno)
+
+vsd.geno <- vst(dds.geno, blind=FALSE)
+rld.geno <- rlog(dds.geno, blind=FALSE)
+head(assay(vsd.geno), 3)
+head(assay(rld.geno), 3)
+
+# test
+dds.geno <- DESeq(dds.geno)
+res.geno <- results(dds.geno)
+select <- order(res.geno$padj,
+                decreasing=TRUE)[1:50]
+df2 <- as.data.frame(colData(dds.geno)[,c("condition","genotype")])
+rownames(df2) = exprnames
+colnames(df2) = c("Condition","Genotype")
+pheatmap(assay(vsd.geno)[select,], cluster_rows=TRUE, show_rownames=TRUE,
+         fontsize_row = 7,fontsize_col = 7,
+         cluster_cols=FALSE, annotation_col=df2,main="Geno VSD Top Expression Diff")
+pheatmap(assay(rld.geno)[select,], cluster_rows=TRUE, show_rownames=TRUE,
+         fontsize_row = 7,fontsize_col = 7,
+         cluster_cols=FALSE, annotation_col=df2,main="Geno RLD Top Expression Diff")
+
+# end test
+
+res.geno <- results(dds.geno, contrast=c("genotype","AF293","hrmA_REV"))
+
+resLFC.geno <- lfcShrink(dds.geno, coef=2, type="apeglm")
+summary(resLFC.geno)
+
+# Get diff expressed
+resSig <- subset(resLFC.geno, resLFC.geno$padj < 0.05 & 
+                   abs(resLFC.geno$log2FoldChange) > 2)
+resSig <- resSig[order(resSig$padj,decreasing=FALSE),]
+write.csv(resSig,"reports/subset1_genotype_AF293_vs_hrmA_REV.csv")
+# not needed- these are same no matter the experimental design
+# write.csv(fpm(dds.geno),"reports/subset1_FPM_Genotype.csv")
+# write.csv(fpkm(dds.geno),"reports/subset1_FPKM_Genotype.csv")
+
+vsd.geno.reorder <- assay(vsd.geno)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
+                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
+                                     "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
+                                     "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
+
+rld.geno.reorder <- assay(rld.geno)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
+                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
+                                     "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
+                                     "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
+
+pheatmap(rld.geno.reorder[rownames(resSig),], cluster_rows=TRUE, show_rownames=FALSE,
+         fontsize_row = 7,fontsize_col = 7,
+         cluster_cols=FALSE, annotation_col=df2,main="RLD p<0.01 and 2-fold Exp Fold change Geno")
+
+pheatmap(vsd.geno.reorder[rownames(resSig),], cluster_rows=TRUE, show_rownames=FALSE,
+         fontsize_row = 7,fontsize_col = 7,
+         cluster_cols=FALSE, annotation_col=df2,main="VSD p<0.01 and 2-fold Exp Fold change Geno")
+
+
+
+# == now generate collapsed
+dds.oxy$id <- factor(paste0(dds.oxy$genotype,'.',dds.oxy$condition),
+                      levels = c("AF293.Normoxia",
+                                 "hrmA_REV.Normoxia",
+                                 "AF293.Hypoxia",
+                                 "hrmA_REV.Hypoxia"))
+
+
+dds.oxy.Coll <- collapseReplicates(dds.oxy,dds.oxy$id)
+colData(dds.oxy.Coll)
+
+
+dds.oxy.Coll <- DESeq(dds.oxy.Coll)
+res.oxy.Coll <- results(dds.oxy.Coll)
+rld.oxy.Coll <- rlog(dds.oxy.Coll, blind=FALSE)
+
+mcols(dds.oxy.Coll)$basepairs = gene_lengths[rownames(mcols(dds.oxy.Coll, use.names=TRUE))]
+
+resSig.oxy.Coll <- subset(res.oxy.Coll,res.oxy$padj < 0.01)
+resSig.oxy.Coll <- resSig.oxy.Coll[order(resSig.oxy.Coll$pvalue,decreasing=FALSE),]
+
+write.csv(resSig.oxy.Coll,"reports/subset1_Collapsed_Normox_vs_Hypoxia.csv")
+write.csv(fpm(dds.oxy.Coll),"reports/subset1_Collapsed_FPM.csv")
+write.csv(fpkm(dds.oxy.Coll),"reports/subset1_Collapsed_FPKM.csv")
+
+resBest.oxy.Coll <- subset(resSig.oxy.Coll,abs(resSig.oxy.Coll$log2FoldChange) > 2)
+
+mat.oxy.Coll <- rld.oxy.Coll[ rownames(resBest.oxy.Coll), ]
+colconditions.oxy.Coll = as.data.frame(colData(dds.oxy.Coll)[,c("condition","genotype")])
 
 #mat.Coll.reorder <- assay(mat.Coll)[,c("AF293.Normoxia","hrmA_REV.Normoxia",
 #                                     "AF293.Hypoxia","hrmA_REV.Hypoxia")]
-pheatmap(assay(mat.Coll),method="complete",
-         main = "Collapsed Reps, p-value < 0.01 and log_fold_change > 2", 
-         show_colnames=T, show_rownames = F,
-         annotation_legend = TRUE, legend=T, cluster_rows=TRUE, 
-         cluster_cols = F, cexRow=0.3,
-         annotation_col=colconditions.Coll)
+
+pdf("plots/heatmaps_showing_collapsed.pdf")
+pheatmap(assay(mat.oxy.Coll),method="complete",
+         main = "Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change > 2", 
+         show_colnames=TRUE, show_rownames = FALSE,
+         annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
+         cluster_cols = FALSE, cexRow=0.3,
+         annotation_col=colconditions.oxy.Coll)
+
+resBest.oxy.Coll4 <- subset(resSig.oxy.Coll,abs(resSig.oxy.Coll$log2FoldChange) > 4)
+
+mat.oxy.Coll4 <- rld.oxy.Coll[ rownames(resBest.oxy.Coll4), ]
+colconditions.oxy.Coll = as.data.frame(colData(dds.oxy.Coll)[,c("condition","genotype")])
+
+pheatmap(assay(mat.oxy.Coll4),method="complete",
+         main = "Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change > 4", 
+         show_colnames=TRUE, show_rownames = FALSE,
+         annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
+         cluster_cols = FALSE, cexRow=0.3,
+         annotation_col=colconditions.oxy.Coll)
+
+
+# == dds geno
+dds.geno$id <- factor(paste0(dds.geno$genotype,'.',dds.geno$condition),
+                     levels = c("AF293.Normoxia",
+                                "hrmA_REV.Normoxia",
+                                "AF293.Hypoxia",
+                                "hrmA_REV.Hypoxia"))
+
+
+dds.geno.Coll <- collapseReplicates(dds.geno,dds.geno$id)
+colData(dds.geno.Coll)
+
+dds.geno.Coll <- DESeq(dds.geno.Coll)
+res.geno.Coll <- results(dds.geno.Coll)
+rld.geno.Coll <- rlog(dds.geno.Coll, blind=FALSE)
+
+mcols(dds.geno.Coll)$basepairs = gene_lengths[rownames(mcols(dds.geno.Coll, use.names=TRUE))]
+
+resSig.geno.Coll <- subset(res.geno.Coll,res.geno$padj < 0.01)
+resSig.geno.Coll <- resSig.geno.Coll[order(resSig.geno.Coll$padj,decreasing=FALSE),]
+
+write.csv(resSig.geno.Coll,"reports/subset1_Collapsed_AF293_vs_hrmA_REV.csv")
+
+resBest.geno.Coll <- subset(resSig.geno.Coll,abs(resSig.geno.Coll$log2FoldChange) > 2)
+
+mat.geno.Coll <- rld.geno.Coll[ rownames(resBest.geno.Coll), ]
+colconditions.geno.Coll = as.data.frame(colData(dds.geno.Coll)[,c("condition","genotype")])
+
+#mat.Coll.reorder <- assay(mat.Coll)[,c("AF293.Normoxia","hrmA_REV.Normoxia",
+#                                     "AF293.Hypoxia","hrmA_REV.Hypoxia")]
+pheatmap(assay(mat.geno.Coll),method="complete",
+         main = "Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change > 2", 
+         show_colnames=TRUE, show_rownames = TRUE,
+         annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
+         cluster_cols = FALSE, cexRow=0.3,
+         annotation_col=colconditions.geno.Coll)
+
+
+resBest.geno.Coll <- subset(resSig.geno.Coll,abs(resSig.geno.Coll$log2FoldChange) > 4)
+
+mat.geno.Coll <- rld.geno.Coll[ rownames(resBest.geno.Coll), ]
+colconditions.geno.Coll = as.data.frame(colData(dds.geno.Coll)[,c("condition","genotype")])
+
+#mat.Coll.reorder <- assay(mat.Coll)[,c("AF293.Normoxia","hrmA_REV.Normoxia",
+#                                     "AF293.Hypoxia","hrmA_REV.Hypoxia")]
+pheatmap(assay(mat.geno.Coll),method="complete",
+         main = "Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change > 4", 
+         show_colnames=TRUE, show_rownames = TRUE,
+         annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
+         cluster_cols = FALSE, cexRow=0.3,
+         annotation_col=colconditions.geno.Coll)
+
+
+pdf("plots/PCA_2types_expression.pdf")
+pcaData <- plotPCA(vsd.oxy, intgroup=c("genotype","condition","replicate"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+
+# FIX ME HERE
+ggplot(pcaData, aes(PC1, PC2, color=genotype,shape=treatment,label=treatment)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+  coord_fixed() + theme_bw()
+
+ggplot(pcaData, aes(PC1, PC2, color=genotype,shape=replicate,label=treatment)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+  coord_fixed() + theme_bw()
+
+ggplot(pcaData, aes(PC1, PC2, color=genotype,shape=replicate,label=treatment)) +
+  geom_point(size=3) + geom_text(size=2) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+  coord_fixed() + theme_bw()
 
