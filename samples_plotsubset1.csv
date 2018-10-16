@@ -1,0 +1,12 @@
+sample.ID,Strain,Condition,Replicate
+S1,AF293,Normoxia,1
+S2,AF293,Normoxia,2
+S3,AF293,Normoxia,3
+S4,AF293,Hypoxia,1
+S5,AF293,Hypoxia,2
+S6,AF293,Hypoxia,3
+S19,hrmA_REV,Normoxia,1
+S20,hrmA_REV,Normoxia,2
+S21,hrmA_REV,Normoxia,3
+S22,hrmA_REV,Hypoxia,1
+S24,hrmA_REV,Hypoxia,3

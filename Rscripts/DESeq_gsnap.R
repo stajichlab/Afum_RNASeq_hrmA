@@ -220,8 +220,8 @@ summary(resOxiaFC)
 # Get diff expressed
 resSig <- subset(resLFC, padj < 0.05)
 resSig <- resSig[order(resSig$pvalue),]
-write.csv(resSig,"reports/Normox_vs_Hypoxia.csv")
-write.csv(fpm(dds),"reports/FPM.csv")
+write.csv(resSig,"reports/all_Normox_vs_Hypoxia.csv")
+write.csv(fpm(dds),"reports/all_FPM.csv")
 topresSig <- as.data.frame(head(resSig$log2FoldChange,50))
 colnames(topresSig) = c("log2FoldChange")
 pheatmap(topresSig, show_rownames=TRUE,show_colnames=FALSE,cluster_rows=FALSE,
