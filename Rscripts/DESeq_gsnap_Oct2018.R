@@ -24,12 +24,14 @@ library(geneplotter)
 library(GenomicFeatures)
 library(genefilter)
 
-
-#txdb <- makeTxDbFromGFF("genome/FungiDB-35_AfumigatusAf293.gff",
-#                        dataSource="FungiDB-35",
-#                        organism="Aspergillus fumigatus")
-#saveDb(txdb,"AfumAf293.FungiDB35.db")
-txdb = loadDb("AfumAf293.FungiDB35.db")
+if( file.exists("AfumAf293.FungiDB35.db")){
+	txdb = loadDb("AfumAf293.FungiDB35.db")
+} else {
+txdb <- makeTxDbFromGFF("genome/FungiDB-35_AfumigatusAf293.gff",
+                        dataSource="FungiDB-35",
+                        organism="Aspergillus fumigatus")
+saveDb(txdb,"AfumAf293.FungiDB35.db")
+}
 ebg <- exonsBy(txdb, by="gene")
 
 gene_lengths = sum(width(reduce(ebg)))
