@@ -24,6 +24,8 @@ library(geneplotter)
 library(GenomicFeatures)
 library(genefilter)
 
+FPKM_MIN=2
+
 if( file.exists("AfumAf293.FungiDB35.db")){
   txdb = loadDb("AfumAf293.FungiDB35.db")
 } else {
@@ -89,7 +91,7 @@ rownames(min_profile) <- rownames(FPKM)
 colnames(min_profile) <- c("Value")
 head(min_profile)
 
-FPKM_filter_genes <- subset(min_profile,min_profile$Value >= 2)
+FPKM_filter_genes <- subset(min_profile,min_profile$Value >= FPKM_MIN)
 
 write.csv(fpm(dds.geno),"reports/subset1_FPM.csv")
 write.csv(fpkm(dds.geno),"reports/subset1_FPKM.csv")
@@ -146,6 +148,7 @@ pheatmap(assay(rld.geno)[select,], cluster_rows=TRUE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
          cluster_cols=FALSE, annotation_col=df2,main="Geno filtered by P < 0.05")
 
+dev.off()
 
 # Get diff expressed
 write.csv(subset(resLFC.geno,resLFC.geno$padj < 0.05),
@@ -173,11 +176,12 @@ rld.geno.reorder <- assay(rld.geno)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","
                                        "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
                                        "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
 
+dev.off()
 pdf("plots/genotype_filtered_heatmaps.pdf",width=10)
 
 pheatmap(rld.geno.reorder[rownames(resSig.geno),], cluster_rows=TRUE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df2,main="FPKM >= 5, p<0.01, 2-fold Exp Fold change Geno")
+         cluster_cols=FALSE, annotation_col=df2,main=paste("FPKM >= ",FPKM_MIN," p<0.01, 2-fold Exp Fold change Geno"))
 
 
 
@@ -210,8 +214,9 @@ colconditions.geno.Coll = as.data.frame(colData(dds.geno.Coll)[,c("condition","g
 #mat.Coll.reorder <- assay(mat.Coll)[,c("AF293.Normoxia","hrmA_REV.Normoxia",
 #                                     "AF293.Hypoxia","hrmA_REV.Hypoxia")]
 pheatmap(assay(mat.geno.Coll),method="complete",
-         main = "Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change >= 2 FPKM >=5", 
+         main = paste("Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change >= 2 FPKM >=", FPKM_MIN),
          show_colnames=TRUE, show_rownames = TRUE,
          annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
          cluster_cols = FALSE, cexRow=0.3,
          annotation_col=colconditions.geno.Coll)
+

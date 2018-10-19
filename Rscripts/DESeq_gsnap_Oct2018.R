@@ -103,7 +103,7 @@ min_profile <- data.frame(apply(FPKM, 1, min) )
 rownames(min_profile) <- rownames(FPKM)
 colnames(min_profile) <- c("Value")
 head(min_profile)
-filter_genes <- subset(min_profile,min_profile$Value > 5)
+filter_genes <- subset(min_profile,min_profile$Value >= 5)
 filter_res.oxy <- subset(res.oxy,rownames(res.oxy) %in% rownames(filter_genes))
 nrow(filter_res.oxy)
 
@@ -132,7 +132,7 @@ summary(resLFC.oxy)
 resLFC.oxy <- subset(resLFC.oxy,rownames(resLFC.oxy) %in% rownames(filter_genes))
 
 resSig <- subset(resLFC.oxy, resLFC.oxy$padj < 0.01 & 
-                   abs(resLFC.oxy$log2FoldChange) > 2)
+                   abs(resLFC.oxy$log2FoldChange) >= 2)
 resSig <- resSig[order(resSig$padj,decreasing=FALSE),]
 write.csv(resSig,"reports/subset1_condition_Normoxia_vs_Hypoxia.csv")
 write.csv(fpm(dds.oxy),"reports/subset1_FPM.csv")
@@ -205,7 +205,7 @@ summary(resLFC.geno)
 resLFC.geno <- subset(resLFC.geno,rownames(resLFC.geno) %in% rownames(filter_genes))
 
 resSig <- subset(resLFC.geno, resLFC.geno$padj < 0.05 & 
-                   abs(resLFC.geno$log2FoldChange) > 2)
+                   abs(resLFC.geno$log2FoldChange) >= 2)
 resSig <- resSig[order(resSig$padj,decreasing=FALSE),]
 write.csv(resSig,"reports/subset1_genotype_AF293_vs_hrmA_REV.csv")
 # not needed- these are same no matter the experimental design
@@ -250,53 +250,49 @@ rld.oxy.Coll <- rlog(dds.oxy.Coll, blind=FALSE)
 
 mcols(dds.oxy.Coll)$basepairs = gene_lengths[rownames(mcols(dds.oxy.Coll, use.names=TRUE))]
 
-resSig.oxy.Coll <- subset(resSig.oxy.Coll,rownames(resSig.oxy.Coll) %in% rownames(filter_genes))
-resSig.oxy.Coll <- subset(res.oxy.Coll,res.oxy$padj < 0.01)
-
-summary(resSig.oxy.Coll)
-
+resSig.oxy.Coll <- subset(res.oxy.Coll,rownames(res.oxy.Coll) %in% rownames(filter_genes) 
+                          & res.oxy.Coll$padj < 0.01
+                          & abs(res.oxy.Coll$log2FoldChange) >= 2 )
 resSig.oxy.Coll <- resSig.oxy.Coll[order(resSig.oxy.Coll$pvalue,decreasing=FALSE),]
+summary(resSig.oxy.Coll)
 
 write.csv(resSig.oxy.Coll,"reports/subset1_Collapsed_Normox_vs_Hypoxia.csv")
 write.csv(fpm(dds.oxy.Coll),"reports/subset1_Collapsed_FPM.csv")
 write.csv(fpkm(dds.oxy.Coll),"reports/subset1_Collapsed_FPKM.csv")
 
-resBest.oxy.Coll <- subset(resSig.oxy.Coll,abs(resSig.oxy.Coll$log2FoldChange) > 2)
-
-mat.oxy.Coll <- rld.oxy.Coll[ rownames(resBest.oxy.Coll), ]
+mat.oxy.Coll <- rld.oxy.Coll[ rownames(resSig.oxy.Coll), ]
 colconditions.oxy.Coll = as.data.frame(colData(dds.oxy.Coll)[,c("condition","genotype")])
-
-#mat.Coll.reorder <- assay(mat.Coll)[,c("AF293.Normoxia","hrmA_REV.Normoxia",
-#                                     "AF293.Hypoxia","hrmA_REV.Hypoxia")]
+mat.oxy.Coll <- assay(mat.oxy.Coll)[,c("AF293.Normoxia","hrmA_REV.Normoxia",
+                                     "AF293.Hypoxia","hrmA_REV.Hypoxia")]
 
 pdf("plots/heatmaps_showing_replicates.pdf",width=10)
 pheatmap(assay(mat.oxy.Coll),method="complete",
-         main = "Collapsed Reps - Oxygen model, p-value < 0.01 and log_fold_change > 2", 
+         main = "Collapsed Reps - Oxygen model, p-value < 0.01 and log_fold_change >= 2", 
          show_colnames=TRUE, show_rownames = FALSE,
          annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
          cluster_cols = FALSE, cexRow=0.3,
          annotation_col=colconditions.oxy.Coll)
 
-resBest.oxy.Coll4 <- subset(resSig.oxy.Coll,abs(resSig.oxy.Coll$log2FoldChange) > 4)
+resBest.oxy.Coll4 <- subset(resSig.oxy.Coll,abs(resSig.oxy.Coll$log2FoldChange) >= 4)
 
 mat.oxy.Coll4 <- rld.oxy.Coll[ rownames(resBest.oxy.Coll4), ]
 colconditions.oxy.Coll = as.data.frame(colData(dds.oxy.Coll)[,c("condition","genotype")])
 
 pheatmap(assay(mat.oxy.Coll4),method="complete",
-         main = "Collapsed Reps - Oxygen model, p-value < 0.01 and log_fold_change > 4", 
+         main = "Collapsed Reps - Oxygen model, p-value < 0.01 and log_fold_change >= 4", 
          show_colnames=TRUE, show_rownames = FALSE,
          annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
          cluster_cols = FALSE, cexRow=0.3,
          annotation_col=colconditions.oxy.Coll)
 
-
-resBest.oxy.Coll4 <- subset(resSig.oxy.Coll,abs(resSig.oxy.Coll$log2FoldChange) > 4)
+resBest.oxy.Coll4 <- resBest.oxy.Coll4[1:100]
 pheatmap(assay(mat.oxy.Coll4),method="complete",
-         main = "Collapsed Reps - Oxygen model, p-value < 0.01 and log_fold_change > 4 top 100", 
+         main = "Collapsed Reps - Oxygen model, p-value < 0.01 and log_fold_change >= 4 top 100", 
          show_colnames=TRUE, show_rownames = TRUE,
          annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
          cluster_cols = FALSE, cexRow=0.3,
          annotation_col=colconditions.oxy.Coll)
+
 # == dds geno
 dds.geno$id <- factor(paste0(dds.geno$genotype,'.',dds.geno$condition),
                      levels = c("AF293.Normoxia",
@@ -314,20 +310,19 @@ rld.geno.Coll <- rlog(dds.geno.Coll, blind=FALSE)
 
 mcols(dds.geno.Coll)$basepairs = gene_lengths[rownames(mcols(dds.geno.Coll, use.names=TRUE))]
 
-resSig.geno.Coll <- subset(res.geno.Coll,res.geno$padj < 0.01)
+# just use the geno significant set from the replicate data
+resSig.geno.Coll <- subset(res.geno.Coll,rownames(res.geno.Coll) %in% rownames(res.geno)) 
 resSig.geno.Coll <- resSig.geno.Coll[order(resSig.geno.Coll$padj,decreasing=FALSE),]
 
 write.csv(resSig.geno.Coll,"reports/subset1_Collapsed_AF293_vs_hrmA_REV.csv")
 
-resBest.geno.Coll <- subset(resSig.geno.Coll,abs(resSig.geno.Coll$log2FoldChange) > 2)
-
-mat.geno.Coll <- rld.geno.Coll[ rownames(resBest.geno.Coll), ]
+mat.geno.Coll <- rld.geno.Coll[ rownames(resSig.geno.Coll), ]
 colconditions.geno.Coll = as.data.frame(colData(dds.geno.Coll)[,c("condition","genotype")])
 
 #mat.Coll.reorder <- assay(mat.Coll)[,c("AF293.Normoxia","hrmA_REV.Normoxia",
 #                                     "AF293.Hypoxia","hrmA_REV.Hypoxia")]
 pheatmap(assay(mat.geno.Coll),method="complete",
-         main = "Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change > 2", 
+         main = "Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change >= 2", 
          show_colnames=TRUE, show_rownames = TRUE,
          annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
          cluster_cols = FALSE, cexRow=0.3,
