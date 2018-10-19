@@ -24,8 +24,9 @@ library(geneplotter)
 library(GenomicFeatures)
 library(genefilter)
 
-FPKM_MIN=2
-
+FPKM_MIN=5
+LOGCUTOFF=1
+PVALUE=0.05
 if( file.exists("AfumAf293.FungiDB35.db")){
   txdb = loadDb("AfumAf293.FungiDB35.db")
 } else {
@@ -86,7 +87,7 @@ nrow(dds.geno)
 mcols(dds.geno)$basepairs = gene_lengths[rownames(mcols(dds.geno, use.names=TRUE))]
 FPKM <- fpkm(dds.geno)
 
-min_profile <- data.frame(apply(FPKM, 1, min) )
+min_profile <- data.frame(apply(FPKM, 1, min) ) #the 1 means row-wise
 rownames(min_profile) <- rownames(FPKM)
 colnames(min_profile) <- c("Value")
 head(min_profile)
@@ -122,7 +123,8 @@ colnames(df2) = c("Condition","Genotype")
 
 # don't show vsd anymore
 
-pdf("plots/genotype_heatmaps_alldata.pdf")
+pdf("plots/genotype_heatmaps_alldata.pdf",width=10)
+
 #pheatmap(assay(vsd.geno)[select,], cluster_rows=TRUE, show_rownames=TRUE,
 #         fontsize_row = 7,fontsize_col = 7,
 #         cluster_cols=FALSE, annotation_col=df2,main="Geno VSD Top Expression Diff")
@@ -139,24 +141,22 @@ pheatmap(assay(rld.geno), cluster_rows=TRUE, show_rownames=TRUE,
 resLFC.geno <- lfcShrink(dds.geno, coef=2, type="apeglm")
 summary(resLFC.geno)
 
-select <- rownames(subset(resLFC.geno, resLFC.geno$padj < 0.01))
+select <- rownames(subset(resLFC.geno, resLFC.geno$padj < PVALUE))
 
 write.csv(resLFC.geno,
           "reports/genotype_AF293_vs_hrmA_REV.no_filter.csv")
 
 pheatmap(assay(rld.geno)[select,], cluster_rows=TRUE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df2,main="Geno filtered by P < 0.05")
-
-dev.off()
+         cluster_cols=FALSE, annotation_col=df2,main=paste("Geno filtered by P < ",PVALUE))
 
 # Get diff expressed
-write.csv(subset(resLFC.geno,resLFC.geno$padj < 0.05),
+write.csv(subset(resLFC.geno,resLFC.geno$padj < PVALUE),
                  "reports/genotype_AF293_vs_hrmA_REV.pvalue_filter.csv")
 
 resSig.geno <- subset(resLFC.geno, rownames(resLFC.geno) %in% rownames(FPKM_filter_genes)
-                    & resLFC.geno$padj < 0.05
-                    & abs(resLFC.geno$log2FoldChange) >= 2)
+                    & resLFC.geno$padj < PVALUE
+                    & abs(resLFC.geno$log2FoldChange) >= LOGCUTOFF)
 
 resSig.geno <- resSig.geno[order(resSig.geno$padj,decreasing=FALSE),]
 
@@ -181,9 +181,8 @@ pdf("plots/genotype_filtered_heatmaps.pdf",width=10)
 
 pheatmap(rld.geno.reorder[rownames(resSig.geno),], cluster_rows=TRUE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df2,main=paste("FPKM >= ",FPKM_MIN," p<0.01, 2-fold Exp Fold change Geno"))
-
-
+         cluster_cols=FALSE, annotation_col=df2,main=paste("FPKM >= ",FPKM_MIN,
+  " p<",PVALUE," ",LOGCUTOFF,"-fold Exp Fold change Geno"))
 
 # == COLLAPSE REPLICATES
 dds.geno$id <- factor(paste0(dds.geno$genotype,'.',dds.geno$condition),
@@ -214,7 +213,8 @@ colconditions.geno.Coll = as.data.frame(colData(dds.geno.Coll)[,c("condition","g
 #mat.Coll.reorder <- assay(mat.Coll)[,c("AF293.Normoxia","hrmA_REV.Normoxia",
 #                                     "AF293.Hypoxia","hrmA_REV.Hypoxia")]
 pheatmap(assay(mat.geno.Coll),method="complete",
-         main = paste("Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change >= 2 FPKM >=", FPKM_MIN),
+         main = paste("Collapsed Reps - Geno model, p-value < ",PVALUE," and log_fold_change >= ",
+                      LOGCUTOFF," FPKM >=", FPKM_MIN),
          show_colnames=TRUE, show_rownames = TRUE,
          annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
          cluster_cols = FALSE, cexRow=0.3,
