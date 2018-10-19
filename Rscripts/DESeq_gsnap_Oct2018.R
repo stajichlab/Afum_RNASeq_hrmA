@@ -81,6 +81,10 @@ nrow(dds.oxy)
 
 mcols(dds.oxy)$basepairs = gene_lengths[rownames(mcols(dds.oxy, use.names=TRUE))]
 
+# USE FPM OR FPKM?
+# remove genes where the FPKM is too low - I assume we then don't care for 
+
+
 dds.oxy <- estimateSizeFactors(dds.oxy)
 dds.oxy <- estimateDispersions(dds.oxy)
 
@@ -92,8 +96,19 @@ head(assay(rld.oxy), 3)
 # test
 dds.oxy <- DESeq(dds.oxy)
 res.oxy <- results(dds.oxy)
-select <- order(res.oxy$padj,
-                decreasing=TRUE)[1:50]
+
+FPKM <- fpkm(dds.oxy)
+
+min_profile <- data.frame(apply(FPKM, 1, min) )
+rownames(min_profile) <- rownames(FPKM)
+colnames(min_profile) <- c("Value")
+head(min_profile)
+filter_genes <- subset(min_profile,min_profile$Value > 5)
+filter_res.oxy <- subset(res.oxy,rownames(res.oxy) %in% rownames(filter_genes))
+nrow(filter_res.oxy)
+
+select <- order(filter_res.oxy$padj,decreasing=TRUE)[1:50]
+
 df2 <- as.data.frame(colData(dds.oxy)[,c("condition","genotype")])
 rownames(df2) = exprnames
 colnames(df2) = c("Condition","Genotype")
@@ -114,6 +129,8 @@ resLFC.oxy <- lfcShrink(dds.oxy, coef=2, type="apeglm")
 summary(resLFC.oxy)
 
 # Get diff expressed
+resLFC.oxy <- subset(resLFC.oxy,rownames(resLFC.oxy) %in% rownames(filter_genes))
+
 resSig <- subset(resLFC.oxy, resLFC.oxy$padj < 0.01 & 
                    abs(resLFC.oxy$log2FoldChange) > 2)
 resSig <- resSig[order(resSig$padj,decreasing=FALSE),]
@@ -161,8 +178,12 @@ head(assay(rld.geno), 3)
 # test
 dds.geno <- DESeq(dds.geno)
 res.geno <- results(dds.geno)
-select <- order(res.geno$padj,
-                decreasing=TRUE)[1:50]
+
+filter_res.geno <- subset(res.geno,rownames(res.geno) %in% rownames(filter_genes))
+
+select <- order(filter_res.geno$padj,
+                decreasing=TRUE)
+
 df2 <- as.data.frame(colData(dds.geno)[,c("condition","genotype")])
 rownames(df2) = exprnames
 colnames(df2) = c("Condition","Genotype")
@@ -181,6 +202,8 @@ resLFC.geno <- lfcShrink(dds.geno, coef=2, type="apeglm")
 summary(resLFC.geno)
 
 # Get diff expressed
+resLFC.geno <- subset(resLFC.geno,rownames(resLFC.geno) %in% rownames(filter_genes))
+
 resSig <- subset(resLFC.geno, resLFC.geno$padj < 0.05 & 
                    abs(resLFC.geno$log2FoldChange) > 2)
 resSig <- resSig[order(resSig$padj,decreasing=FALSE),]
@@ -227,7 +250,11 @@ rld.oxy.Coll <- rlog(dds.oxy.Coll, blind=FALSE)
 
 mcols(dds.oxy.Coll)$basepairs = gene_lengths[rownames(mcols(dds.oxy.Coll, use.names=TRUE))]
 
+resSig.oxy.Coll <- subset(resSig.oxy.Coll,rownames(resSig.oxy.Coll) %in% rownames(filter_genes))
 resSig.oxy.Coll <- subset(res.oxy.Coll,res.oxy$padj < 0.01)
+
+summary(resSig.oxy.Coll)
+
 resSig.oxy.Coll <- resSig.oxy.Coll[order(resSig.oxy.Coll$pvalue,decreasing=FALSE),]
 
 write.csv(resSig.oxy.Coll,"reports/subset1_Collapsed_Normox_vs_Hypoxia.csv")
@@ -242,9 +269,9 @@ colconditions.oxy.Coll = as.data.frame(colData(dds.oxy.Coll)[,c("condition","gen
 #mat.Coll.reorder <- assay(mat.Coll)[,c("AF293.Normoxia","hrmA_REV.Normoxia",
 #                                     "AF293.Hypoxia","hrmA_REV.Hypoxia")]
 
-pdf("plots/heatmaps_showing_collapsed.pdf")
+pdf("plots/heatmaps_showing_replicates.pdf",width=10)
 pheatmap(assay(mat.oxy.Coll),method="complete",
-         main = "Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change > 2", 
+         main = "Collapsed Reps - Oxygen model, p-value < 0.01 and log_fold_change > 2", 
          show_colnames=TRUE, show_rownames = FALSE,
          annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
          cluster_cols = FALSE, cexRow=0.3,
@@ -256,13 +283,20 @@ mat.oxy.Coll4 <- rld.oxy.Coll[ rownames(resBest.oxy.Coll4), ]
 colconditions.oxy.Coll = as.data.frame(colData(dds.oxy.Coll)[,c("condition","genotype")])
 
 pheatmap(assay(mat.oxy.Coll4),method="complete",
-         main = "Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change > 4", 
+         main = "Collapsed Reps - Oxygen model, p-value < 0.01 and log_fold_change > 4", 
          show_colnames=TRUE, show_rownames = FALSE,
          annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
          cluster_cols = FALSE, cexRow=0.3,
          annotation_col=colconditions.oxy.Coll)
 
 
+resBest.oxy.Coll4 <- subset(resSig.oxy.Coll,abs(resSig.oxy.Coll$log2FoldChange) > 4)
+pheatmap(assay(mat.oxy.Coll4),method="complete",
+         main = "Collapsed Reps - Oxygen model, p-value < 0.01 and log_fold_change > 4 top 100", 
+         show_colnames=TRUE, show_rownames = TRUE,
+         annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
+         cluster_cols = FALSE, cexRow=0.3,
+         annotation_col=colconditions.oxy.Coll)
 # == dds geno
 dds.geno$id <- factor(paste0(dds.geno$genotype,'.',dds.geno$condition),
                      levels = c("AF293.Normoxia",
@@ -300,21 +334,6 @@ pheatmap(assay(mat.geno.Coll),method="complete",
          annotation_col=colconditions.geno.Coll)
 
 
-resBest.geno.Coll <- subset(resSig.geno.Coll,abs(resSig.geno.Coll$log2FoldChange) > 4)
-
-mat.geno.Coll <- rld.geno.Coll[ rownames(resBest.geno.Coll), ]
-colconditions.geno.Coll = as.data.frame(colData(dds.geno.Coll)[,c("condition","genotype")])
-
-#mat.Coll.reorder <- assay(mat.Coll)[,c("AF293.Normoxia","hrmA_REV.Normoxia",
-#                                     "AF293.Hypoxia","hrmA_REV.Hypoxia")]
-pheatmap(assay(mat.geno.Coll),method="complete",
-         main = "Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change > 4", 
-         show_colnames=TRUE, show_rownames = TRUE,
-         annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
-         cluster_cols = FALSE, cexRow=0.3,
-         annotation_col=colconditions.geno.Coll)
-
-
 pdf("plots/PCA_2types_expression.pdf")
 pcaData <- plotPCA(vsd.oxy, intgroup=c("genotype","condition","replicate"), returnData=TRUE)
 percentVar <- round(100 * attr(pcaData, "percentVar"))
@@ -337,4 +356,4 @@ ggplot(pcaData, aes(PC1, PC2, color=genotype,shape=replicate,label=treatment)) +
   xlab(paste0("PC1: ",percentVar[1],"% variance")) +
   ylab(paste0("PC2: ",percentVar[2],"% variance")) +
   coord_fixed() + theme_bw()
-
+dev.off()
