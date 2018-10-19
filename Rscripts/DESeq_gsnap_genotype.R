@@ -38,7 +38,7 @@ if( file.exists("AfumAf293.FungiDB35.db")){
 ebg <- exonsBy(txdb, by="gene")
 
 gene_lengths = sum(width(reduce(ebg)))
-
+print(paste("starting gene count",length(gene_lengths)))
 my_pal2 = mypal2 <- colorRampPalette(brewer.pal(6, "YlOrRd"))
 
 countdata <- read.table("results/gsnap_subread/hrmA.Af293.gsnap_reads.tab", header=TRUE, row.names=1)
@@ -84,16 +84,18 @@ nrow(dds.geno)
 dds.geno <- dds.geno[ rowSums(counts(dds.geno)) > 1, ]
 nrow(dds.geno)
 
+print(paste("Num of genes, requiring at least one read:",nrow(dds.geno)))
+
 mcols(dds.geno)$basepairs = gene_lengths[rownames(mcols(dds.geno, use.names=TRUE))]
 FPKM <- fpkm(dds.geno)
 
-min_profile <- data.frame(apply(FPKM, 1, min) ) #the 1 means row-wise
+min_profile <- data.frame(apply(FPKM, 1, max) ) #the 1 means row-wise
 rownames(min_profile) <- rownames(FPKM)
 colnames(min_profile) <- c("Value")
 head(min_profile)
 
 FPKM_filter_genes <- subset(min_profile,min_profile$Value >= FPKM_MIN)
-
+print(paste("Num of genes where max(FPKM) >= ",FPKM_MIN,":",length(rownames(FPKM_filter_genes))))
 write.csv(fpm(dds.geno),"reports/subset1_FPM.csv")
 write.csv(fpkm(dds.geno),"reports/subset1_FPKM.csv")
 
@@ -122,6 +124,7 @@ rownames(df2) = exprnames
 colnames(df2) = c("Condition","Genotype")
 
 # don't show vsd anymore
+
 
 pdf("plots/genotype_heatmaps_alldata.pdf",width=10)
 
@@ -162,6 +165,7 @@ resSig.geno <- resSig.geno[order(resSig.geno$padj,decreasing=FALSE),]
 
 write.csv(resSig.geno,"reports/genotype_AF293_vs_hrmA_REV.pvalue_FPKM_Filter.csv")
 
+write.csv(subset(FPKM,rownames(FPKM) %in% rownames(resSig.geno)),"reports/genotype_AF293_vs_hrmA_REV.filtered_FPKM.csv")
 # not needed- these are same no matter the experimental design
 # write.csv(fpm(dds.geno),"reports/subset1_FPM_Genotype.csv")
 # write.csv(fpkm(dds.geno),"reports/subset1_FPKM_Genotype.csv")
