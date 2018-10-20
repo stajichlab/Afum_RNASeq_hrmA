@@ -165,6 +165,11 @@ resSig.geno <- resSig.geno[order(resSig.geno$padj,decreasing=FALSE),]
 
 write.csv(resSig.geno,"reports/genotype_AF293_vs_hrmA_REV.pvalue_FPKM_Filter.csv")
 
+UpFourFold <- subset(resSig.geno,resSig.geno$log2FoldChange >=0 )
+DnFourFold <- subset(resSig.geno,resSig.geno$log2FoldChange <= 0)
+write.csv(UpFourFold,"reports/genotype_AF293_vs_hrmA_REV.pvalue_FPKM_Filter.Up.csv",quote=FALSE)
+write.csv(DnFourFold,"reports/genotype_AF293_vs_hrmA_REV.pvalue_FPKM_Filter.Down.csv",quote=FALSE)
+
 write.csv(subset(FPKM,rownames(FPKM) %in% rownames(resSig.geno)),"reports/genotype_AF293_vs_hrmA_REV.filtered_FPKM.csv")
 # not needed- these are same no matter the experimental design
 # write.csv(fpm(dds.geno),"reports/subset1_FPM_Genotype.csv")
