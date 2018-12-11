@@ -89,9 +89,9 @@ dds.oxy <- estimateSizeFactors(dds.oxy)
 dds.oxy <- estimateDispersions(dds.oxy)
 
 vsd.oxy <- vst(dds.oxy, blind=FALSE)
-rld.oxy <- rlog(dds.oxy, blind=FALSE)
+#rld.oxy <- rlog(dds.oxy, blind=FALSE)
 head(assay(vsd.oxy), 3)
-head(assay(rld.oxy), 3)
+#head(assay(rld.oxy), 3)
 
 # test
 dds.oxy <- DESeq(dds.oxy)
@@ -115,11 +115,11 @@ colnames(df2) = c("Condition","Genotype")
 pdf("plots/heatmaps_showing_replicates.pdf")
 pheatmap(assay(vsd.oxy)[select,], cluster_rows=TRUE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df2,main="Oxy VSD Top Expression")
+         cluster_cols=FALSE, annotation_col=df2,main="Oxygen VSD Top Expression")
 
-pheatmap(assay(rld.oxy)[select,], cluster_rows=TRUE, show_rownames=TRUE,
-         fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df2,main="Oxy RLD Top Expression")
+#pheatmap(assay(rld.oxy)[select,], cluster_rows=TRUE, show_rownames=TRUE,
+#         fontsize_row = 7,fontsize_col = 7,
+#         cluster_cols=FALSE, annotation_col=df2,main="Oxy RLD Top Expression")
 
 # end test
 
@@ -143,17 +143,18 @@ vsd.oxy.reorder <- assay(vsd.oxy)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF
                                      "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
                                      "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
 
-rld.oxy.reorder <- assay(rld.oxy)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
-                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
-                                     "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
-                                     "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
+#rld.oxy.reorder <- assay(rld.oxy)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
+#                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
+ #                                    "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
+ #                                    "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
 
-pheatmap(rld.oxy.reorder[rownames(resSig),], cluster_rows=TRUE, show_rownames=FALSE,
-         fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df2,main="RLD p<0.01 and 2-fold Exp Fold change Oxy")
+#pheatmap(rld.oxy.reorder[rownames(resSig),], cluster_rows=TRUE, show_rownames=FALSE,
+#         fontsize_row = 7,fontsize_col = 7,
+#         cluster_cols=FALSE, annotation_col=df2,main="RLD p<0.01 and 2-fold Exp Fold change Oxy")
 
-pheatmap(vsd.oxy.reorder[rownames(resSig),], cluster_rows=TRUE, show_rownames=FALSE,
-         fontsize_row = 7,fontsize_col = 7,
+pheatmap(vsd.oxy.reorder[rownames(resSig),], cluster_rows=TRUE,
+					     show_rownames=FALSE,
+         fontsize_row = 7,fontsize_col = 7,  
          cluster_cols=FALSE, annotation_col=df2,main="VSD p<0.01 and 2-fold Exp Fold change Oxy")
 
 # == now test for difference when using genotype
@@ -171,9 +172,9 @@ dds.geno <- estimateSizeFactors(dds.geno)
 dds.geno <- estimateDispersions(dds.geno)
 
 vsd.geno <- vst(dds.geno, blind=FALSE)
-rld.geno <- rlog(dds.geno, blind=FALSE)
+#rld.geno <- rlog(dds.geno, blind=FALSE)
 head(assay(vsd.geno), 3)
-head(assay(rld.geno), 3)
+#head(assay(rld.geno), 3)
 
 # test
 dds.geno <- DESeq(dds.geno)
@@ -187,12 +188,13 @@ select <- order(filter_res.geno$padj,
 df2 <- as.data.frame(colData(dds.geno)[,c("condition","genotype")])
 rownames(df2) = exprnames
 colnames(df2) = c("Condition","Genotype")
-pheatmap(assay(vsd.geno)[select,], cluster_rows=TRUE, show_rownames=TRUE,
+pheatmap(assay(vsd.geno)[select,], cluster_rows=TRUE, show_rownames=FALSE,
          fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df2,main="Geno VSD Top Expression Diff")
-pheatmap(assay(rld.geno)[select,], cluster_rows=TRUE, show_rownames=TRUE,
-         fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df2,main="Geno RLD Top Expression Diff")
+         cluster_cols=FALSE, annotation_col=df2,main="Genotype VSD Top Expression Diff")
+
+#pheatmap(assay(rld.geno)[select,], cluster_rows=TRUE, show_rownames=TRUE,
+#         fontsize_row = 7,fontsize_col = 7,
+#         cluster_cols=FALSE, annotation_col=df2,main="Geno RLD Top Expression Diff")
 
 # end test
 
@@ -217,16 +219,16 @@ vsd.geno.reorder <- assay(vsd.geno)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","
                                      "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
                                      "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
 
-rld.geno.reorder <- assay(rld.geno)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
-                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
-                                     "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
-                                     "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
+#rld.geno.reorder <- assay(rld.geno)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
+#                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
+#                                     "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
+#                                     "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
 
-pheatmap(rld.geno.reorder[rownames(resSig),], cluster_rows=TRUE, show_rownames=FALSE,
-         fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df2,main="RLD p<0.01 and 2-fold Exp Fold change Geno")
+#pheatmap(rld.geno.reorder[rownames(resSig),], cluster_rows=TRUE, show_rownames=FALSE,
+#         fontsize_row = 7,fontsize_col = 7,
+#         cluster_cols=FALSE, annotation_col=df2,main="RLD p<0.01 and 2-fold Exp Fold change Geno")
 
-pheatmap(vsd.geno.reorder[rownames(resSig),], cluster_rows=TRUE, show_rownames=FALSE,
+pheatmap(vsd.geno.reorder[rownames(resSig),], cluster_rows=TRUE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
          cluster_cols=FALSE, annotation_col=df2,main="VSD p<0.01 and 2-fold Exp Fold change Geno")
 
@@ -264,9 +266,7 @@ mat.oxy.Coll <- rld.oxy.Coll[ rownames(resSig.oxy.Coll), ]
 colconditions.oxy.Coll = as.data.frame(colData(dds.oxy.Coll)[,c("condition","genotype")])
 mat.oxy.Coll <- assay(mat.oxy.Coll)[,c("AF293.Normoxia","hrmA_REV.Normoxia",
                                      "AF293.Hypoxia","hrmA_REV.Hypoxia")]
-
-pdf("plots/heatmaps_showing_replicates.pdf",width=10)
-pheatmap(assay(mat.oxy.Coll),method="complete",
+pheatmap(mat.oxy.Coll,method="complete",
          main = "Collapsed Reps - Oxygen model, p-value < 0.01 and log_fold_change >= 2", 
          show_colnames=TRUE, show_rownames = FALSE,
          annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
@@ -280,18 +280,11 @@ colconditions.oxy.Coll = as.data.frame(colData(dds.oxy.Coll)[,c("condition","gen
 
 pheatmap(assay(mat.oxy.Coll4),method="complete",
          main = "Collapsed Reps - Oxygen model, p-value < 0.01 and log_fold_change >= 4", 
-         show_colnames=TRUE, show_rownames = FALSE,
-         annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
-         cluster_cols = FALSE, cexRow=0.3,
-         annotation_col=colconditions.oxy.Coll)
-
-resBest.oxy.Coll4 <- resBest.oxy.Coll4[1:100]
-pheatmap(assay(mat.oxy.Coll4),method="complete",
-         main = "Collapsed Reps - Oxygen model, p-value < 0.01 and log_fold_change >= 4 top 100", 
          show_colnames=TRUE, show_rownames = TRUE,
          annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
          cluster_cols = FALSE, cexRow=0.3,
          annotation_col=colconditions.oxy.Coll)
+
 
 # == dds geno
 dds.geno$id <- factor(paste0(dds.geno$genotype,'.',dds.geno$condition),
@@ -323,7 +316,7 @@ colconditions.geno.Coll = as.data.frame(colData(dds.geno.Coll)[,c("condition","g
 #                                     "AF293.Hypoxia","hrmA_REV.Hypoxia")]
 pheatmap(assay(mat.geno.Coll),method="complete",
          main = "Collapsed Reps - Geno model, p-value < 0.01 and log_fold_change >= 2", 
-         show_colnames=TRUE, show_rownames = TRUE,
+         show_colnames=TRUE, show_rownames = FALSE,
          annotation_legend = TRUE, legend=TRUE, cluster_rows=TRUE, 
          cluster_cols = FALSE, cexRow=0.3,
          annotation_col=colconditions.geno.Coll)
