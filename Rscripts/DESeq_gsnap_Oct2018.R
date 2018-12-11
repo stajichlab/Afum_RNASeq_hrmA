@@ -113,6 +113,7 @@ df2 <- as.data.frame(colData(dds.oxy)[,c("condition","genotype")])
 rownames(df2) = exprnames
 colnames(df2) = c("Condition","Genotype")
 pdf("plots/heatmaps_showing_replicates.pdf")
+
 pheatmap(assay(vsd.oxy)[select,], cluster_rows=TRUE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
          cluster_cols=FALSE, annotation_col=df2,main="Oxygen VSD Top Expression")
