@@ -48,7 +48,8 @@ head(countdata)
 
 # this subset are only Af293 and hrmA_REV and
 # removed rep2 of hrmA_REV_Hypoxia
-samples <- read.csv("samples_plotsubset1.csv",header=TRUE)
+#samples <- read.csv("samples_plotsubset1.csv",header=TRUE)
+samples <- read.csv("samples_nobadrep.csv",header=TRUE)
 exprnames <- do.call(paste,c(samples[c("Strain","Condition","Replicate")],sep="_"))
 exprnames <- sub(".([123])$",".r\\1",exprnames,perl=TRUE)
 
@@ -107,12 +108,12 @@ filter_genes <- subset(min_profile,min_profile$Value >= 5)
 filter_res.oxy <- subset(res.oxy,rownames(res.oxy) %in% rownames(filter_genes))
 nrow(filter_res.oxy)
 
-select <- order(filter_res.oxy$padj,decreasing=TRUE)[1:50]
+select <- order(filter_res.oxy$padj,decreasing=TRUE)[1:75]
 
 df2 <- as.data.frame(colData(dds.oxy)[,c("condition","genotype")])
 rownames(df2) = exprnames
 colnames(df2) = c("Condition","Genotype")
-pdf("plots/heatmaps_showing_replicates.pdf")
+pdf("plots/heatmaps_Oxygenalso_allstrains.pdf")
 
 pheatmap(assay(vsd.oxy)[select,], cluster_rows=TRUE, show_rownames=TRUE,
          fontsize_row = 7,fontsize_col = 7,
@@ -139,10 +140,10 @@ write.csv(resSig,"reports/subset1_condition_Normoxia_vs_Hypoxia.csv")
 write.csv(fpm(dds.oxy),"reports/subset1_FPM.csv")
 write.csv(fpkm(dds.oxy),"reports/subset1_FPKM.csv")
 
-vsd.oxy.reorder <- assay(vsd.oxy)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
-                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
-                                     "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
-                                     "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
+#vsd.oxy.reorder <- assay(vsd.oxy)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
+#                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
+#                                     "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
+#                                     "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
 
 #rld.oxy.reorder <- assay(rld.oxy)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
 #                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
@@ -153,10 +154,15 @@ vsd.oxy.reorder <- assay(vsd.oxy)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF
 #         fontsize_row = 7,fontsize_col = 7,
 #         cluster_cols=FALSE, annotation_col=df2,main="RLD p<0.01 and 2-fold Exp Fold change Oxy")
 
-pheatmap(vsd.oxy.reorder[rownames(resSig),], cluster_rows=TRUE,
+pheatmap(assay(vsd.oxy[rownames(resSig),]), cluster_rows=TRUE,
 					     show_rownames=FALSE,
          fontsize_row = 7,fontsize_col = 7,  
          cluster_cols=FALSE, annotation_col=df2,main="VSD p<0.01 and 2-fold Exp Fold change Oxy")
+
+pheatmap(assay(vsd.oxy[rownames(resSig)[1:75],]), cluster_rows=TRUE,
+         show_rownames=FALSE,
+         fontsize_row = 7,fontsize_col = 7,  
+         cluster_cols=FALSE, annotation_col=df2,main="Top 50 VSD p<0.01 and 2-fold Exp Fold change Oxy")
 
 # == now test for difference when using genotype
 dds.geno <- DESeqDataSetFromMatrix(countData = countdata,
@@ -199,26 +205,26 @@ pheatmap(assay(vsd.geno)[select,], cluster_rows=TRUE, show_rownames=FALSE,
 
 # end test
 
-res.geno <- results(dds.geno, contrast=c("genotype","AF293","hrmA_REV"))
+#res.geno <- results(dds.geno, contrast=c("genotype","AF293","hrmA_REV"))
 
-resLFC.geno <- lfcShrink(dds.geno, coef=2, type="apeglm")
-summary(resLFC.geno)
+#resLFC.geno <- lfcShrink(dds.geno, coef=2, type="apeglm")
+#summary(resLFC.geno)
 
 # Get diff expressed
-resLFC.geno <- subset(resLFC.geno,rownames(resLFC.geno) %in% rownames(filter_genes))
+#resLFC.geno <- subset(resLFC.geno,rownames(resLFC.geno) %in% rownames(filter_genes))
 
-resSig <- subset(resLFC.geno, resLFC.geno$padj < 0.05 & 
-                   abs(resLFC.geno$log2FoldChange) >= 2)
-resSig <- resSig[order(resSig$padj,decreasing=FALSE),]
-write.csv(resSig,"reports/subset1_genotype_AF293_vs_hrmA_REV.csv")
+#resSig <- subset(resLFC.geno, resLFC.geno$padj < 0.05 & 
+#                   abs(resLFC.geno$log2FoldChange) >= 2)
+#resSig <- resSig[order(resSig$padj,decreasing=FALSE),]
+#write.csv(resSig,"reports/subset1_genotype_AF293_vs_hrmA_REV.csv")
 # not needed- these are same no matter the experimental design
 # write.csv(fpm(dds.geno),"reports/subset1_FPM_Genotype.csv")
 # write.csv(fpkm(dds.geno),"reports/subset1_FPKM_Genotype.csv")
 
-vsd.geno.reorder <- assay(vsd.geno)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
-                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
-                                     "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
-                                     "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
+#vsd.geno.reorder <- assay(vsd.geno)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
+#                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
+#                                     "AF293_Hypoxia.r1","AF293_Hypoxia.r2","AF293_Hypoxia.r3",
+#                                     "hrmA_REV_Hypoxia.r1","hrmA_REV_Hypoxia.r3")]
 
 #rld.geno.reorder <- assay(rld.geno)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","AF293_Normoxia.r3",
 #                                     "hrmA_REV_Normoxia.r1","hrmA_REV_Normoxia.r2","hrmA_REV_Normoxia.r3",
@@ -229,10 +235,9 @@ vsd.geno.reorder <- assay(vsd.geno)[,c("AF293_Normoxia.r1","AF293_Normoxia.r2","
 #         fontsize_row = 7,fontsize_col = 7,
 #         cluster_cols=FALSE, annotation_col=df2,main="RLD p<0.01 and 2-fold Exp Fold change Geno")
 
-pheatmap(vsd.geno.reorder[rownames(resSig),], cluster_rows=TRUE, show_rownames=TRUE,
-         fontsize_row = 7,fontsize_col = 7,
-         cluster_cols=FALSE, annotation_col=df2,main="VSD p<0.01 and 2-fold Exp Fold change Geno")
-
+#pheatmap(assay(vsd.geno[rownames(resSig),]), cluster_rows=TRUE, show_rownames=TRUE,
+#         fontsize_row = 7,fontsize_col = 7,
+#         cluster_cols=FALSE, annotation_col=df2,main="VSD p<0.01 and 2-fold Exp Fold change Geno")
 
 
 # == now generate collapsed
