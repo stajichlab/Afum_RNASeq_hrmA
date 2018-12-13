@@ -189,3 +189,11 @@ pheatmap(assay(vsd.geno)[select,], cluster_rows=TRUE, show_rownames=FALSE,
 pheatmap(assay(vsd.geno)[select,], cluster_rows=TRUE, show_rownames=FALSE,
          fontsize_row = 7,fontsize_col = 7,
          cluster_cols=TRUE, annotation_col=df2,main="Genotype VSD All Expression Diff")
+
+pdf("plots/Genotype_VSD_Exp_0.01.pdf")
+select <- order(subset(filter_res.geno, filter_res.geno$padj < 0.05)$padj, decreasing=TRUE)
+
+pheatmap(assay(vsd.geno)[select,], cluster_rows=TRUE, show_rownames=FALSE,
+         fontsize_row = 6,fontsize_col = 7,
+         cluster_cols=TRUE, annotation_col=df2,main="Genotype VST All Expression Diff p<0.05")
+
