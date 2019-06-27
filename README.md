@@ -12,7 +12,7 @@ pipeline/
   - 03_gsnap_subread_counts.sh run with arrayjobs `sbatch --array=1-30`
 
 R analysis for processing counts and generating plots were done with 
-Rscript Rscript/DESeq_gsnap_Oct2018_allstrains.R
+```Rscript Rscript/DESeq_gsnap_Oct2018_allstrains.R```
 and
-Rscript Rscript/DESeq_gsnap_Oct2018_allstrain_withOxy.R
+```Rscript Rscript/DESeq_gsnap_Oct2018_allstrain_withOxy.R```
 
